@@ -58,7 +58,14 @@ const translations = {
     contact_heading: "Ponte en <span>contacto</span>",
     contact_phone_label: "Teléfono",
     contact_location_label: "Ubicación",
-    footer_text: "Todos los derechos reservados."
+    footer_text: "Todos los derechos reservados.",
+    nav_download: 'CV',
+    modal_title: 'Descargar CV',
+    modal_subtitle: 'Elige el formato que prefieras',
+    modal_visual_title: 'Versión Visual',
+    modal_visual_desc: 'Diseño con foto y sidebar',
+    modal_complete_title: 'Versión Completa',
+    modal_complete_desc: 'Formato clásico detallado',
   },
   en: {
     nav_experience: "Experience",
@@ -119,7 +126,14 @@ const translations = {
     contact_heading: "Get in <span>touch</span>",
     contact_phone_label: "Phone",
     contact_location_label: "Location",
-    footer_text: "All rights reserved."
+    footer_text: "All rights reserved.",
+    nav_download: 'CV',
+    modal_title: 'Download CV',
+    modal_subtitle: 'Choose your preferred format',
+    modal_visual_title: 'Visual Version',
+    modal_visual_desc: 'Design with photo and sidebar',
+    modal_complete_title: 'Complete Version',
+    modal_complete_desc: 'Detailed classic format',
   },
   fr: {
     nav_experience: "Expérience",
@@ -180,7 +194,14 @@ const translations = {
     contact_heading: "Entrons en <span>contact</span>",
     contact_phone_label: "Téléphone",
     contact_location_label: "Localisation",
-    footer_text: "Tous droits réservés."
+    footer_text: "Tous droits réservés.",
+    nav_download: 'CV',
+    modal_title: 'Télécharger CV',
+    modal_subtitle: 'Choisissez le format souhaité',
+    modal_visual_title: 'Version Visuelle',
+    modal_visual_desc: 'Design avec photo et sidebar',
+    modal_complete_title: 'Version Complète',
+    modal_complete_desc: 'Format classique détaillé',
   }
 };
 
@@ -243,3 +264,28 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
+
+function openCVModal() {
+  document.getElementById('cvModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  // Close mobile menu if open
+  const navLinks = document.getElementById('navLinks');
+  if (navLinks) navLinks.classList.remove('mobile-open');
+}
+
+function closeCVModal(event) {
+  // If called from overlay click, only close if clicking the overlay itself
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('cvModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function downloadCV(type) {
+  // Get current language (check which lang-btn has 'active' class)
+  const activeLangBtn = document.querySelector('.lang-btn.active');
+  const lang = activeLangBtn ? activeLangBtn.textContent.trim() : 'ES';
+  
+  // Build the file path
+  const prefix = type === 'visual' ? 'CV_Visual' : 'CV_Complete';
+  const filePath = `cv/${prefix}_${lang}.pdf`;
+}
