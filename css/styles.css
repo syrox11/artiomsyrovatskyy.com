@@ -1,6 +1,3 @@
-/* ═══════════════════════════════════════
-   CSS VARIABLES & RESET
-   ═══════════════════════════════════════ */
 :root {
   --bg-primary: #0a0a0f;
   --bg-secondary: #111118;
@@ -45,9 +42,6 @@ body {
 a { color: var(--accent); text-decoration: none; transition: color 0.3s; }
 a:hover { color: var(--accent-light); }
 
-/* ═══════════════════════════════════════
-   GRID BACKGROUND
-   ═══════════════════════════════════════ */
 .grid-bg {
   position: fixed;
   inset: 0;
@@ -59,9 +53,6 @@ a:hover { color: var(--accent-light); }
   z-index: 0;
 }
 
-/* ═══════════════════════════════════════
-   NAVIGATION
-   ═══════════════════════════════════════ */
 nav {
   position: fixed;
   top: 0;
@@ -123,7 +114,6 @@ nav.scrolled {
 .nav-links a:hover { color: var(--text-primary); }
 .nav-links a:hover::after { width: 100%; }
 
-/* Language switcher */
 .lang-switcher {
   display: flex;
   gap: 2px;
@@ -157,7 +147,6 @@ nav.scrolled {
   background: rgba(255,255,255,0.05);
 }
 
-/* Mobile menu */
 .hamburger {
   display: none;
   background: none;
@@ -176,9 +165,6 @@ nav.scrolled {
   border-radius: 2px;
 }
 
-/* ═══════════════════════════════════════
-   HERO SECTION
-   ═══════════════════════════════════════ */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -197,7 +183,6 @@ nav.scrolled {
   align-items: center;
 }
 
-/* Decorative blobs */
 .hero::before {
   content: '';
   position: absolute;
@@ -325,7 +310,6 @@ nav.scrolled {
   transform: translateY(-2px);
 }
 
-/* Hero visual / photo area */
 .hero-visual {
   position: relative;
   z-index: 1;
@@ -385,7 +369,6 @@ nav.scrolled {
   object-fit: cover;
 }
 
-/* Floating badges around photo */
 .float-badge {
   position: absolute;
   background: var(--bg-card);
@@ -412,9 +395,6 @@ nav.scrolled {
   50% { transform: translateY(-8px); }
 }
 
-/* ═══════════════════════════════════════
-   SECTION SHARED STYLES
-   ═══════════════════════════════════════ */
 section {
   position: relative;
   z-index: 1;
@@ -447,7 +427,6 @@ section {
 
 .section-heading span { color: var(--accent); }
 
-/* Reveal on scroll */
 .reveal {
   opacity: 0;
   transform: translateY(40px);
@@ -459,9 +438,6 @@ section {
   transform: translateY(0);
 }
 
-/* ═══════════════════════════════════════
-   EXPERIENCE SECTION
-   ═══════════════════════════════════════ */
 #experience {
   background: var(--bg-secondary);
 }
@@ -551,9 +527,6 @@ section {
 .timeline-item:nth-child(2) .timeline-bullets li::before { color: var(--accent-2); }
 .timeline-item:nth-child(3) .timeline-bullets li::before { color: var(--accent); }
 
-/* ═══════════════════════════════════════
-   SKILLS SECTION
-   ═══════════════════════════════════════ */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -641,9 +614,6 @@ section {
   color: var(--accent);
 }
 
-/* ═══════════════════════════════════════
-   EDUCATION + LANGUAGES
-   ═══════════════════════════════════════ */
 #education {
   background: var(--bg-secondary);
 }
@@ -702,9 +672,6 @@ section {
   border-radius: 6px;
 }
 
-/* ═══════════════════════════════════════
-   CONTACT SECTION
-   ═══════════════════════════════════════ */
 .contact-grid {
   display: flex;
   gap: 1.2rem;
@@ -761,9 +728,6 @@ section {
   margin-top: 2px;
 }
 
-/* ═══════════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════════ */
 footer {
   text-align: center;
   padding: 2rem;
@@ -774,9 +738,6 @@ footer {
   z-index: 1;
 }
 
-/* ═══════════════════════════════════════
-   ANIMATIONS
-   ═══════════════════════════════════════ */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -787,7 +748,6 @@ footer {
   to { opacity: 1; }
 }
 
-/* Scroll indicator */
 .scroll-indicator {
   position: absolute;
   bottom: 2rem;
@@ -822,9 +782,6 @@ footer {
   50% { transform: rotate(45deg) translateY(6px); opacity: 1; }
 }
 
-/* ═══════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════ */
 @media (max-width: 900px) {
   .hero-container {
     grid-template-columns: 1fr;
@@ -841,7 +798,7 @@ footer {
   .hamburger { display: block; }
   .contact-grid { flex-direction: column; }
 
-  /* Mobile menu */
+
   .nav-links.mobile-open {
     display: flex;
     flex-direction: column;

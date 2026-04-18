@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════
-// TRANSLATIONS
-// ═══════════════════════════════════════
 const translations = {
   es: {
     nav_experience: "Experiencia",
@@ -187,21 +184,17 @@ const translations = {
   }
 };
 
-// ═══════════════════════════════════════
-// LANGUAGE SWITCHER
-// ═══════════════════════════════════════
+
 let currentLang = 'es';
 
 function setLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
 
-  // Update buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
   });
 
-  // Update all translatable elements
   const t = translations[lang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -215,31 +208,21 @@ function setLang(lang) {
   });
 }
 
-// ═══════════════════════════════════════
-// NAV SCROLL EFFECT
-// ═══════════════════════════════════════
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-// ═══════════════════════════════════════
-// MOBILE MENU
-// ═══════════════════════════════════════
 function toggleMobileMenu() {
   document.getElementById('navLinks').classList.toggle('mobile-open');
 }
 
-// Close mobile menu on link click
 document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', () => {
     document.getElementById('navLinks').classList.remove('mobile-open');
   });
 });
 
-// ═══════════════════════════════════════
-// SCROLL REVEAL
-// ═══════════════════════════════════════
 const revealElements = document.querySelectorAll('.reveal');
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -251,9 +234,6 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 revealElements.forEach(el => revealObserver.observe(el));
 
-// ═══════════════════════════════════════
-// SMOOTH SCROLL
-// ═══════════════════════════════════════
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
     e.preventDefault();
