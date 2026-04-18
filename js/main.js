@@ -299,7 +299,7 @@ function downloadCV(type) {
   // Trigger download
   const a = document.createElement('a');
   a.href = filePath;
-  a.download = `${prefix}_${lang}_Artiom_Syrovatskyy.pdf`;
+  a.download = `${prefix}_${lang}.pdf`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
