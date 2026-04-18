@@ -782,10 +782,18 @@ footer {
   50% { transform: rotate(45deg) translateY(6px); opacity: 1; }
 }
 
+/* ═══════════ RESPONSIVE ═══════════ */
+
 @media (max-width: 900px) {
   .hero-container {
     grid-template-columns: 1fr;
     gap: 3rem;
+    text-align: center;
+  }
+  .hero-name,
+  .hero-title,
+  .hero-greeting,
+  .hero-desc {
     text-align: center;
   }
   .hero-desc { margin-left: auto; margin-right: auto; }
@@ -796,9 +804,18 @@ footer {
   .edu-lang-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
   .hamburger { display: block; }
+  .hamburger span {
+    width: 28px;
+    height: 3px;
+    background: var(--accent);
+  }
   .contact-grid { flex-direction: column; }
+  .hero::before,
+  .hero::after {
+    display: none;
+  }
 
-
+  /* Mobile menu */
   .nav-links.mobile-open {
     display: flex;
     flex-direction: column;
