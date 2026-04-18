@@ -265,6 +265,9 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
+// ═══════════ CV DOWNLOAD MODAL ═══════════
+// Add this at the END of your main.js file
+
 function openCVModal() {
   document.getElementById('cvModal').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -287,5 +290,23 @@ function downloadCV(type) {
   
   // Build the file path
   const prefix = type === 'visual' ? 'CV_Visual' : 'CV_Complete';
-  const filePath = `cv/${prefix}_${lang}.pdf`;
+  const filePath = `cv/${prefix}_${lang}_Artiom_Syrovatskyy.pdf`;
+  
+  // Trigger download
+  const a = document.createElement('a');
+  a.href = filePath;
+  a.download = `${prefix}_${lang}_Artiom_Syrovatskyy.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+  // Close modal
+  closeCVModal();
 }
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeCVModal();
+});
+
+
