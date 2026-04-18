@@ -157,9 +157,9 @@ nav.scrolled {
 
 .hamburger span {
   display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--text-primary);
+  width: 28px;
+  height: 3px;
+  background: var(--accent);
   margin: 5px 0;
   transition: all 0.3s;
   border-radius: 2px;
@@ -674,12 +674,13 @@ section {
 
 .contact-grid {
   display: flex;
+  flex-direction: column;
   gap: 1.2rem;
   margin-top: 2rem;
 }
 
 .contact-card {
-  flex: 1;
+  width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -801,15 +802,12 @@ footer {
   .hero-visual { order: -1; }
   .photo-frame { width: 260px; height: 320px; }
   .float-badge { display: none; }
+  .scroll-indicator { display: none; }
   .edu-lang-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
   .hamburger { display: block; }
-  .hamburger span {
-    width: 28px;
-    height: 3px;
-    background: var(--accent);
-  }
   .contact-grid { flex-direction: column; }
+  .contact-card { flex: none; width: 100%; }
   .hero::before,
   .hero::after {
     display: none;
