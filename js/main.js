@@ -205,7 +205,7 @@ const translations = {
   }
 };
 
-let currentLang = 'es'; // Default language
+let currentLang = 'es';
 
 const browserLang = (navigator.language || navigator.userLanguage).slice(0, 2);
 if (['es', 'en', 'fr'].includes(browserLang)) {
