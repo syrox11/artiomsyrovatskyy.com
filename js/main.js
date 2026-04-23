@@ -212,6 +212,8 @@ if (['es', 'en', 'fr'].includes(browserLang)) {
   currentLang = browserLang;
 }
 
+setLang(currentLang);
+
 function setLang(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
