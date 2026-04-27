@@ -66,6 +66,8 @@ const translations = {
     modal_visual_desc: 'Diseño con foto y sidebar',
     modal_complete_title: 'Versión Completa',
     modal_complete_desc: 'Formato clásico detallado',
+    deepdive_label: '¿Quieres ver el detalle técnico?',
+    deepdive_text: 'Cada skill tiene su propia página con ejemplos de código reales, patrones y decisiones de arquitectura.',
   },
   en: {
     nav_experience: "Experience",
@@ -134,6 +136,8 @@ const translations = {
     modal_visual_desc: 'Design with photo and sidebar',
     modal_complete_title: 'Complete Version',
     modal_complete_desc: 'Detailed classic format',
+    deepdive_label: 'Want the full technical picture?',
+    deepdive_text: 'Each skill has its own page with real code examples, patterns, and architecture decisions.',
   },
   fr: {
     nav_experience: "Expérience",
@@ -202,13 +206,18 @@ const translations = {
     modal_visual_desc: 'Design avec photo et sidebar',
     modal_complete_title: 'Version Complète',
     modal_complete_desc: 'Format classique détaillé',
+    deepdive_label: 'Envie d\'aller plus loin ?',
+    deepdive_text: 'Chaque compétence a sa propre page avec des exemples de code réels, des patterns et des décisions d\'architecture.',
   }
 };
 
 let currentLang = 'es';
 
-const browserLang = (navigator.language || navigator.userLanguage).slice(0, 2);
-if (['es', 'en', 'fr'].includes(browserLang)) {
+const savedLang = localStorage.getItem('lang');
+const browserLang = (navigator.language || navigator.userLanguage || '').slice(0, 2);
+if (savedLang && ['es', 'en', 'fr'].includes(savedLang)) {
+  currentLang = savedLang;
+} else if (['es', 'en', 'fr'].includes(browserLang)) {
   currentLang = browserLang;
 }
 
@@ -216,6 +225,7 @@ setLang(currentLang);
 
 function setLang(lang) {
   currentLang = lang;
+  localStorage.setItem('lang', lang);
   document.documentElement.lang = lang;
 
   document.querySelectorAll('.lang-btn').forEach(btn => {

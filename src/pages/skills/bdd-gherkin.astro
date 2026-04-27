@@ -1,0 +1,331 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="BDD & Gherkin"
+  description="Cucumber-driven BDD workflows — feature files as living documentation, typed step definitions, and hooks for setup and teardown."
+  tags={['Cucumber', 'Gherkin', 'BDD', 'TypeScript', 'Step Definitions', 'Hooks']}
+  level="daily"
+  experience="2+ years"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="bdd_p_how">
+    BDD with Cucumber lets me write tests that serve as executable specifications.
+    Feature files are written before implementation — they define the contract in plain
+    language that stakeholders, developers, and QAs can all read and challenge.
+    Step definitions back each scenario with real HTTP calls and typed assertions,
+    and a strongly-typed <code>World</code> class keeps scenario state explicit and safe.
+  </p>
+
+  <h2 data-i18n="bdd_h2_feature">Feature file: restaurant booking flow</h2>
+  <p data-i18n="bdd_p_feature">
+    Each scenario covers a distinct slice of the booking domain — create, cancel, modify,
+    operating-hours rejection, and availability conflict. The <code>Background</code> block
+    handles shared pre-conditions so individual scenarios stay focused on the variation
+    being tested.
+  </p>
+
+  <Terminal filename="features/booking/booking.feature">
+    <pre><code>Feature: Restaurant Booking Management
+  As a registered customer
+  I want to manage my table reservations
+  So that I can plan my dining experience in advance
+
+  Background:
+    Given I am authenticated as a registered customer
+
+  Scenario: Successfully create a booking
+    When I request a table for 2 on "2026-05-15" at "19:30"
+    Then the booking should be confirmed
+    And I should receive a booking reference number
+
+  Scenario: Cancel an existing booking
+    Given I have an active booking for 2 on "2026-05-15" at "19:30"
+    When I cancel my booking
+    Then the booking status should be "cancelled"
+    And a cancellation confirmation should be issued
+
+  Scenario: Modify the party size of an existing booking
+    Given I have an active booking for 2 on "2026-05-15" at "19:30"
+    When I update the party size to 4
+    Then the booking should reflect 4 guests
+    And the table assignment should be updated accordingly
+
+  Scenario Outline: Reject a booking outside operating hours
+    When I request a table for 2 on "2026-05-20" at "&lt;time&gt;"
+    Then the booking should be rejected
+    And the error message should contain "&lt;reason&gt;"
+
+    Examples:
+      | time  | reason                  |
+      | 07:00 | Outside operating hours |
+      | 23:30 | Outside operating hours |
+
+  Scenario: Attempt to book a fully booked time slot
+    Given the restaurant is fully booked on "2026-05-20" at "20:00"
+    When I request a table for 2 on "2026-05-20" at "20:00"
+    Then the booking should be rejected
+    And the error message should contain "No availability"</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="bdd_h2_world">World context — typed shared state</h2>
+  <p data-i18n="bdd_p_world">
+    The <code>World</code> class holds all state that steps share within a scenario.
+    Typing it in TypeScript forces explicit intent — if a step writes <code>bookingId</code>,
+    the next step that reads it gets a compile error if the field doesn't exist on <code>World</code>.
+    The Axios instance lives here too, pre-configured with the base URL and a permissive
+    status validator so steps can assert on error responses without Axios throwing first.
+  </p>
+
+  <Terminal filename="features/support/world.ts">
+    <pre><code>import &#123; setWorldConstructor, World, IWorldOptions &#125; from '@cucumber/cucumber';
+import axios, &#123; type AxiosInstance &#125; from 'axios';
+
+export interface ApiResponse &#123;
+  status: number;
+  body: Record&lt;string, unknown&gt;;
+&#125;
+
+export class BookingWorld extends World &#123;
+  readonly api: AxiosInstance;
+
+  authToken = '';
+  customerId = '';
+  bookingId: string | null = null;
+  bookingStatus = '';
+  lastResponse: ApiResponse | null = null;
+
+  constructor(options: IWorldOptions) &#123;
+    super(options);
+    this.api = axios.create(&#123;
+      baseURL: 'https://api.tablebook.local/v1',
+      validateStatus: () =&gt; true,
+    &#125;);
+  &#125;
+
+  get authHeaders() &#123;
+    return &#123; Authorization: `Bearer $&#123;this.authToken&#125;` &#125;;
+  &#125;
+&#125;
+
+setWorldConstructor(BookingWorld);</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="bdd_h2_steps">Step definitions</h2>
+  <p data-i18n="bdd_p_steps">
+    Steps import the typed <code>BookingWorld</code> and use <code>this</code> to read
+    and write shared state across a scenario. Each step makes exactly one assertion or
+    one side effect — this keeps failures precise and readable without digging into
+    stack traces. I prefer <code>assert.strictEqual</code> over matcher libraries for
+    its unambiguous output.
+  </p>
+
+  <Terminal filename="features/step-definitions/booking.steps.ts">
+    <pre><code>import &#123; Given, When, Then &#125; from '@cucumber/cucumber';
+import assert from 'node:assert/strict';
+import type &#123; BookingWorld &#125; from '../support/world';
+
+Given('I am authenticated as a registered customer',
+  async function (this: BookingWorld) &#123;
+    const res = await this.api.post('/auth/token', &#123;
+      username: 'test.customer@tablebook.local',
+      password: 'Test@Secure99',
+    &#125;);
+    assert.strictEqual(res.status, 200, 'Auth failed — check test credentials');
+    this.authToken = res.data.accessToken;
+    this.customerId = res.data.customerId;
+  &#125;
+);
+
+Given('I have an active booking for &#123;int&#125; on &#123;string&#125; at &#123;string&#125;',
+  async function (this: BookingWorld, guests: number, date: string, time: string) &#123;
+    const res = await this.api.post('/bookings', &#123;
+      customerId: this.customerId,
+      date,
+      time,
+      partySize: guests,
+    &#125;, &#123; headers: this.authHeaders &#125;);
+    assert.strictEqual(res.status, 201);
+    this.bookingId = res.data.bookingId;
+    this.bookingStatus = res.data.status;
+  &#125;
+);
+
+Given('the restaurant is fully booked on &#123;string&#125; at &#123;string&#125;',
+  async function (this: BookingWorld, date: string, time: string) &#123;
+    const res = await this.api.get(
+      `/availability?date=$&#123;date&#125;&amp;time=$&#123;time&#125;`,
+      &#123; headers: this.authHeaders &#125;
+    );
+    assert.strictEqual(
+      res.data.available,
+      false,
+      'Expected slot to be fully booked — seed data may be missing'
+    );
+  &#125;
+);
+
+When('I request a table for &#123;int&#125; on &#123;string&#125; at &#123;string&#125;',
+  async function (this: BookingWorld, guests: number, date: string, time: string) &#123;
+    const res = await this.api.post('/bookings', &#123;
+      customerId: this.customerId,
+      date,
+      time,
+      partySize: guests,
+    &#125;, &#123; headers: this.authHeaders &#125;);
+    this.lastResponse = &#123; status: res.status, body: res.data &#125;;
+    if (res.status === 201) &#123;
+      this.bookingId = res.data.bookingId;
+      this.bookingStatus = res.data.status;
+    &#125;
+  &#125;
+);
+
+When('I cancel my booking', async function (this: BookingWorld) &#123;
+  assert.ok(this.bookingId, 'bookingId must be set before cancelling');
+  const res = await this.api.delete(
+    `/bookings/$&#123;this.bookingId&#125;`,
+    &#123; headers: this.authHeaders &#125;
+  );
+  this.lastResponse = &#123; status: res.status, body: res.data &#125;;
+  this.bookingStatus = res.data.status;
+&#125;);
+
+When('I update the party size to &#123;int&#125;',
+  async function (this: BookingWorld, newSize: number) &#123;
+    assert.ok(this.bookingId, 'bookingId must be set before updating');
+    const res = await this.api.patch(
+      `/bookings/$&#123;this.bookingId&#125;`,
+      &#123; partySize: newSize &#125;,
+      &#123; headers: this.authHeaders &#125;
+    );
+    this.lastResponse = &#123; status: res.status, body: res.data &#125;;
+    if (res.status === 200) &#123;
+      this.bookingStatus = res.data.status;
+    &#125;
+  &#125;
+);
+
+Then('the booking should be confirmed', function (this: BookingWorld) &#123;
+  assert.strictEqual(this.lastResponse?.status, 201);
+  assert.strictEqual(this.bookingStatus, 'confirmed');
+&#125;);
+
+Then('I should receive a booking reference number', function (this: BookingWorld) &#123;
+  assert.ok(this.bookingId, 'Expected a bookingId in the response');
+  assert.match(this.bookingId, /^BKG-[A-Z0-9]&#123;8&#125;$/, 'bookingId format invalid');
+&#125;);
+
+Then('the booking status should be &#123;string&#125;',
+  function (this: BookingWorld, expectedStatus: string) &#123;
+    assert.strictEqual(this.bookingStatus, expectedStatus);
+  &#125;
+);
+
+Then('a cancellation confirmation should be issued', function (this: BookingWorld) &#123;
+  assert.strictEqual(this.lastResponse?.status, 200);
+  assert.ok(
+    this.lastResponse?.body.cancelledAt,
+    'cancelledAt timestamp missing from cancellation response'
+  );
+&#125;);
+
+Then('the booking should reflect &#123;int&#125; guests',
+  function (this: BookingWorld, expected: number) &#123;
+    assert.strictEqual(this.lastResponse?.status, 200);
+    assert.strictEqual(this.lastResponse?.body.partySize, expected);
+  &#125;
+);
+
+Then('the table assignment should be updated accordingly', function (this: BookingWorld) &#123;
+  assert.ok(this.lastResponse?.body.tableId, 'Expected a tableId in the response');
+&#125;);
+
+Then('the booking should be rejected', function (this: BookingWorld) &#123;
+  const status = this.lastResponse?.status;
+  assert.ok(
+    status === 409 || status === 422,
+    `Expected 409 or 422, got $&#123;status&#125;`
+  );
+&#125;);
+
+Then('the error message should contain &#123;string&#125;',
+  function (this: BookingWorld, phrase: string) &#123;
+    const message = this.lastResponse?.body.message as string;
+    assert.ok(
+      message?.includes(phrase),
+      `Expected "$&#123;phrase&#125;" in "$&#123;message&#125;"`
+    );
+  &#125;
+);</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="bdd_h2_hooks">Hooks: health check, tracing, and cleanup</h2>
+  <p data-i18n="bdd_p_hooks">
+    Hooks handle infrastructure concerns separately from business logic. <code>BeforeAll</code>
+    guards the entire run against a dead environment. <code>Before</code> attaches a
+    correlation ID to every API call so failed scenarios can be traced in server logs.
+    <code>After</code> deletes any booking created during the scenario — regardless of
+    pass or fail — so the environment stays clean across runs. <code>AfterAll</code>
+    signals the API to purge any orphaned test data for this run.
+  </p>
+
+  <Terminal filename="features/support/hooks.ts">
+    <pre><code>import &#123; Before, After, BeforeAll, AfterAll &#125; from '@cucumber/cucumber';
+import assert from 'node:assert/strict';
+import &#123; randomUUID &#125; from 'node:crypto';
+import type &#123; BookingWorld &#125; from './world';
+
+const TEST_RUN_ID = process.env.TEST_RUN_ID ?? randomUUID();
+
+BeforeAll(async function () &#123;
+  const res = await fetch('https://api.tablebook.local/v1/health');
+  assert.strictEqual(
+    res.status,
+    200,
+    'API health check failed — aborting test run'
+  );
+&#125;);
+
+Before(async function (this: BookingWorld) &#123;
+  const correlationId = randomUUID();
+  this.api.defaults.headers.common['x-correlation-id'] = correlationId;
+  this.api.defaults.headers.common['x-test-run-id'] = TEST_RUN_ID;
+&#125;);
+
+After(async function (this: BookingWorld) &#123;
+  if (!this.bookingId) return;
+
+  await this.api.delete(
+    `/bookings/$&#123;this.bookingId&#125;`,
+    &#123; headers: this.authHeaders &#125;
+  );
+  this.bookingId = null;
+&#125;);
+
+AfterAll(async function () &#123;
+  await fetch('https://api.tablebook.local/v1/test/purge', &#123;
+    method: 'POST',
+    headers: &#123;
+      'Content-Type': 'application/json',
+      'x-test-run-id': TEST_RUN_ID,
+    &#125;,
+    body: JSON.stringify(&#123; runId: TEST_RUN_ID &#125;),
+  &#125;);
+&#125;);</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="bdd_li1"><strong>Scenarios as specifications</strong> — feature files are written before implementation; they define the contract, not just verify it</li>
+    <li data-i18n="bdd_li2"><strong>Typed World</strong> — sharing state through a strongly-typed class surfaces integration errors at compile time, not in CI at midnight</li>
+    <li data-i18n="bdd_li3"><strong>One assertion per Then</strong> — precise step names produce readable failure messages; you know exactly what broke without reading a stack trace</li>
+    <li data-i18n="bdd_li4"><strong>Idempotent cleanup</strong> — the After hook always runs even on failure, so environments stay consistent across the full suite</li>
+    <li data-i18n="bdd_li5"><strong>Scenario Outlines for data variation</strong> — tables replace copy-paste scenarios while keeping Gherkin as the single source of truth</li>
+    <li data-i18n="bdd_li6"><strong>Hooks for infrastructure, steps for business logic</strong> — health checks and tracing headers live in hooks; authentication and domain actions live in steps</li>
+  </ul>
+
+</SkillLayout>

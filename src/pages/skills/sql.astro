@@ -1,0 +1,187 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="SQL & Data Validation"
+  description="Database testing, query optimization, data integrity checks, and migration validation."
+  tags={['SQL', 'PostgreSQL', 'MySQL', 'Data QA']}
+  level="frequent"
+  experience="3+ years"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="sql_p_how">
+    SQL is where I validate what the application can't see itself. An API can return
+    200 and still leave the database in a corrupt state — a booking confirmed with no
+    corresponding payment row, a deleted user whose records weren't cascaded.
+    I write data validation queries as part of the test suite to assert on the
+    source of truth directly, not just on what the UI reflects.
+  </p>
+
+  <h2 data-i18n="sql_h2_integrity">Data integrity check after a booking flow</h2>
+  <p data-i18n="sql_p_integrity">
+    After an E2E or API test creates a booking, these helpers assert that the
+    database reflects the expected state — not just that the response said it did.
+    Running this in a TypeScript helper keeps it composable and typed.
+  </p>
+
+  <Terminal filename="tests/helpers/db-assertions.ts">
+    <pre><code>import &#123; Pool &#125; from 'pg';
+import assert from 'node:assert/strict';
+
+const pool = new Pool(&#123; connectionString: process.env.TEST_DB_URL &#125;);
+
+export async function assertBookingPersisted(bookingRef: string) &#123;
+  const &#123; rows &#125; = await pool.query&lt;&#123;
+    status: string;
+    customer_id: string;
+    table_id: string;
+    party_size: number;
+  &#125;&gt;(
+    `SELECT status, customer_id, table_id, party_size
+     FROM bookings
+     WHERE booking_ref = $1`,
+    [bookingRef]
+  );
+
+  assert.strictEqual(rows.length, 1, `No booking row found for ref $&#123;bookingRef&#125;`);
+  assert.strictEqual(rows[0].status, 'confirmed');
+  assert.ok(rows[0].table_id, 'table_id must be assigned on a confirmed booking');
+&#125;
+
+export async function assertCancellationCascaded(bookingRef: string) &#123;
+  const &#123; rows &#125; = await pool.query(
+    `SELECT b.status, t.locked_until
+     FROM bookings b
+     JOIN tables t ON t.id = b.table_id
+     WHERE b.booking_ref = $1`,
+    [bookingRef]
+  );
+
+  assert.strictEqual(rows[0].status, 'cancelled');
+  assert.strictEqual(
+    rows[0].locked_until,
+    null,
+    'Table lock must be released after cancellation'
+  );
+&#125;
+
+export async function assertNoOrphanedPayment(bookingRef: string) &#123;
+  const &#123; rows &#125; = await pool.query(
+    `SELECT p.id
+     FROM payments p
+     LEFT JOIN bookings b ON b.id = p.booking_id
+     WHERE p.booking_ref = $1
+       AND b.id IS NULL`,
+    [bookingRef]
+  );
+
+  assert.strictEqual(
+    rows.length,
+    0,
+    `Found $&#123;rows.length&#125; orphaned payment row(s) for ref $&#123;bookingRef&#125;`
+  );
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="sql_h2_migration">Migration integrity check</h2>
+  <p data-i18n="sql_p_migration">
+    Before running a migration in staging, I validate that constraints, indexes, and
+    foreign keys match the expected schema. This query pattern catches cases where a
+    migration applied cleanly but left the schema in a different shape than the
+    codebase expects.
+  </p>
+
+  <Terminal filename="scripts/validate-migration.sql">
+    <pre><code>-- Verify foreign key exists after migration
+SELECT
+  tc.constraint_name,
+  kcu.column_name,
+  ccu.table_name  AS referenced_table,
+  ccu.column_name AS referenced_column
+FROM information_schema.table_constraints       AS tc
+JOIN information_schema.key_column_usage        AS kcu
+  ON tc.constraint_name = kcu.constraint_name
+JOIN information_schema.constraint_column_usage AS ccu
+  ON ccu.constraint_name = tc.constraint_name
+WHERE tc.constraint_type = 'FOREIGN KEY'
+  AND tc.table_name      = 'bookings'
+  AND kcu.column_name    = 'customer_id';
+-- Expected: 1 row -> fk_bookings_customer_id -> customers.id
+
+-- Verify index was created
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'bookings'
+  AND indexname = 'idx_bookings_date_status';
+-- Expected: 1 row
+
+-- Verify no NOT NULL column was left without a default
+SELECT column_name, column_default
+FROM information_schema.columns
+WHERE table_name   = 'bookings'
+  AND is_nullable  = 'NO'
+  AND column_default IS NULL
+  AND column_name NOT IN ('id', 'booking_ref');
+-- Expected: 0 rows</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="sql_h2_bulk">Row-count assertion after a bulk operation</h2>
+  <p data-i18n="sql_p_bulk">
+    Bulk operations — imports, scheduled jobs, data migrations — are easy to verify at
+    the API layer but the API often only returns a summary count. I assert directly
+    against the table to catch silent partial failures.
+  </p>
+
+  <Terminal filename="tests/helpers/bulk-assertions.ts">
+    <pre><code>import &#123; Pool &#125; from 'pg';
+import assert from 'node:assert/strict';
+
+const pool = new Pool(&#123; connectionString: process.env.TEST_DB_URL &#125;);
+
+export async function assertBulkImportResult(&#123;
+  batchId,
+  expectedInserted,
+  expectedSkipped,
+&#125;: &#123;
+  batchId: string;
+  expectedInserted: number;
+  expectedSkipped: number;
+&#125;) &#123;
+  const &#123; rows &#125; = await pool.query&lt;&#123; status: string; count: string &#125;&gt;(
+    `SELECT status, COUNT(*) AS count
+     FROM import_log
+     WHERE batch_id = $1
+     GROUP BY status`,
+    [batchId]
+  );
+
+  const byStatus = Object.fromEntries(
+    rows.map(r =&gt; [r.status, parseInt(r.count, 10)])
+  );
+
+  assert.strictEqual(
+    byStatus['inserted'] ?? 0,
+    expectedInserted,
+    `Expected $&#123;expectedInserted&#125; inserted rows, got $&#123;byStatus['inserted'] ?? 0&#125;`
+  );
+  assert.strictEqual(
+    byStatus['skipped'] ?? 0,
+    expectedSkipped,
+    `Expected $&#123;expectedSkipped&#125; skipped rows, got $&#123;byStatus['skipped'] ?? 0&#125;`
+  );
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="sql_li1"><strong>Assert on the source of truth</strong> — API responses reflect application state; the database is the actual state. Both need to agree.</li>
+    <li data-i18n="sql_li2"><strong>Parameterised queries always</strong> — test helpers that build queries with string interpolation are a SQL injection vector, even in test environments.</li>
+    <li data-i18n="sql_li3"><strong>Migration validation as a pre-deploy step</strong> — schema assertions run before the application boots in staging, not after a cryptic runtime error surfaces.</li>
+    <li data-i18n="sql_li4"><strong>Cascade verification</strong> — delete and cancel operations need explicit checks that related rows were updated or released, not just the primary record.</li>
+    <li data-i18n="sql_li5"><strong>Connection pool cleanup</strong> — test helpers call <code>pool.end()</code> in an <code>afterAll</code> hook to avoid hanging test processes from open DB connections.</li>
+  </ul>
+
+</SkillLayout>

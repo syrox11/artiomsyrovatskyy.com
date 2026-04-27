@@ -1,0 +1,202 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="TypeScript & JavaScript"
+  description="Strong typing, interfaces, generics, and clean architecture patterns for test frameworks."
+  tags={['TypeScript', 'JavaScript', 'Node.js', 'OOP', 'Generics']}
+  level="daily"
+  experience="3+ years"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="ts_p_how">
+    TypeScript is the layer that makes a test framework maintainable at scale.
+    Without it, a renamed API field silently breaks ten step definitions and you
+    only find out in CI. With it, the compiler catches the breakage the moment
+    the interface changes. I use strict mode, explicit return types, and utility
+    types to build test helpers that are hard to misuse.
+  </p>
+
+  <h2 data-i18n="ts_h2_wrapper">Typed API response wrapper</h2>
+  <p data-i18n="ts_p_wrapper">
+    A generic response wrapper keeps every API call consistent — status, body,
+    and latency in one typed shape. Step definitions and assertions work against
+    this type rather than raw Axios responses, so if the wrapper changes,
+    TypeScript flags every affected call site immediately.
+  </p>
+
+  <Terminal filename="src/types/api.ts">
+    <pre><code>export interface ApiResponse&lt;T = unknown&gt; &#123;
+  status: number;
+  body: T;
+  latencyMs: number;
+&#125;
+
+export interface PaginatedResponse&lt;T&gt; &#123;
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+&#125;
+
+export interface ApiError &#123;
+  code: string;
+  message: string;
+  details?: Record&lt;string, string[]&gt;;
+&#125;
+
+export function isApiError(body: unknown): body is ApiError &#123;
+  return (
+    typeof body === 'object' &amp;&amp;
+    body !== null &amp;&amp;
+    'code' in body &amp;&amp;
+    'message' in body
+  );
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ts_h2_request">Generic request helper</h2>
+  <p data-i18n="ts_p_request">
+    A single typed wrapper around Axios gives every test consistent error handling
+    and latency tracking without repeating the same boilerplate in every step.
+    The generic parameter <code>T</code> flows through to the return type so
+    callers get full autocomplete on <code>res.body</code>.
+  </p>
+
+  <Terminal filename="src/helpers/request.ts">
+    <pre><code>import axios from 'axios';
+import type &#123; ApiResponse &#125; from '../types/api';
+
+export async function request&lt;T = unknown&gt;(&#123;
+  method,
+  url,
+  body,
+  headers = &#123;&#125;,
+&#125;: &#123;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  url: string;
+  body?: unknown;
+  headers?: Record&lt;string, string&gt;;
+&#125;): Promise&lt;ApiResponse&lt;T&gt;&gt; &#123;
+  const start = Date.now();
+
+  const res = await axios.request&lt;T&gt;(&#123;
+    method,
+    url,
+    data: body,
+    headers,
+    validateStatus: () =&gt; true,
+  &#125;);
+
+  return &#123;
+    status: res.status,
+    body: res.data,
+    latencyMs: Date.now() - start,
+  &#125;;
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ts_h2_factory">Utility types in test factories</h2>
+  <p data-i18n="ts_p_factory">
+    Utility types eliminate copy-paste interfaces. <code>CreateBookingPayload</code>
+    is derived from the full <code>Booking</code> type — so if a required field is
+    added to the domain model, the factory breaks at compile time rather than
+    silently producing an invalid request.
+  </p>
+
+  <Terminal filename="src/factories/booking.factory.ts">
+    <pre><code>interface Booking &#123;
+  id: string;
+  bookingRef: string;
+  customerId: string;
+  date: string;
+  time: string;
+  partySize: number;
+  tableId: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  createdAt: string;
+&#125;
+
+type CreateBookingPayload = Pick&lt;Booking,
+  | 'customerId'
+  | 'date'
+  | 'time'
+  | 'partySize'
+&gt;;
+
+export function buildBookingPayload(
+  overrides: Partial&lt;CreateBookingPayload&gt; = &#123;&#125;
+): CreateBookingPayload &#123;
+  return &#123;
+    customerId: 'cust-test-001',
+    date: '2026-06-15',
+    time: '19:30',
+    partySize: 2,
+    ...overrides,
+  &#125;;
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ts_h2_pom">Typed Page Object with strict locators</h2>
+  <p data-i18n="ts_p_pom">
+    Page Object classes declare locators as <code>readonly</code> so nothing
+    outside the class can reassign them. The constructor is the only place
+    selectors live — fixing a broken selector is a one-line change with no
+    risk of missing an occurrence elsewhere.
+  </p>
+
+  <Terminal filename="src/pages/BookingPage.ts">
+    <pre><code>import type &#123; Page, Locator &#125; from '@playwright/test';
+
+export class BookingPage &#123;
+  readonly page: Page;
+  readonly dateInput: Locator;
+  readonly timeSelect: Locator;
+  readonly partySizeInput: Locator;
+  readonly submitButton: Locator;
+  readonly confirmationBanner: Locator;
+  readonly errorMessage: Locator;
+
+  constructor(page: Page) &#123;
+    this.page             = page;
+    this.dateInput        = page.getByLabel('Date');
+    this.timeSelect       = page.getByLabel('Time');
+    this.partySizeInput   = page.getByLabel('Party size');
+    this.submitButton     = page.getByRole('button', &#123; name: 'Book table' &#125;);
+    this.confirmationBanner = page.getByRole('alert', &#123; name: /confirmed/i &#125;);
+    this.errorMessage     = page.getByRole('alert', &#123; name: /error/i &#125;);
+  &#125;
+
+  async fillBookingForm(&#123;
+    date,
+    time,
+    partySize,
+  &#125;: &#123;
+    date: string;
+    time: string;
+    partySize: number;
+  &#125;): Promise&lt;void&gt; &#123;
+    await this.dateInput.fill(date);
+    await this.timeSelect.selectOption(time);
+    await this.partySizeInput.fill(String(partySize));
+  &#125;
+
+  async submit(): Promise&lt;void&gt; &#123;
+    await this.submitButton.click();
+  &#125;
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="ts_li1"><strong>Strict mode everywhere</strong> — <code>"strict": true</code> in <code>tsconfig.json</code> catches null dereferences and implicit <code>any</code> before they become runtime failures</li>
+    <li data-i18n="ts_li2"><strong>Derive types, don't duplicate them</strong> — <code>Pick</code>, <code>Partial</code>, <code>Omit</code>, and <code>Record</code> keep payload types in sync with domain interfaces automatically</li>
+    <li data-i18n="ts_li3"><strong>Explicit return types on helpers</strong> — callers see the contract without reading the implementation; TypeScript enforces it doesn't drift</li>
+    <li data-i18n="ts_li4"><strong>Type guards over casting</strong> — <code>isApiError(body)</code> narrows safely; <code>body as ApiError</code> just suppresses the error and hides the bug</li>
+    <li data-i18n="ts_li5"><strong>Readonly on Page Object locators</strong> — prevents accidental reassignment and signals these are stable references, not mutable state</li>
+  </ul>
+
+</SkillLayout>

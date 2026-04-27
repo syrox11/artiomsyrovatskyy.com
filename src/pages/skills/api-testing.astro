@@ -1,0 +1,146 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="API Testing & Automation"
+  description="REST API test automation with Axios and Cucumber — schema validation, chained requests, and BDD-driven scenarios."
+  tags={['Axios', 'REST API', 'Cucumber', 'TypeScript', 'Postman']}
+  level="daily"
+  experience="3+ years"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="api_p_how">
+    I build API test suites that go beyond basic status code checks. My approach
+    combines Cucumber/Gherkin for readable scenarios with TypeScript services
+    that handle authentication, request chaining, and response validation.
+    At Fourvenues, this covers booking flows, payment processing, and event management endpoints.
+  </p>
+
+  <h2 data-i18n="api_h2_example">Real example: Booking zone creation</h2>
+  <p data-i18n="api_p_example">
+    This is based on a real test scenario from the Fourvenues platform.
+    The Gherkin scenario describes the business flow, while the step definitions
+    call a typed service layer.
+  </p>
+
+  <Terminal filename="features/zona_reserva.feature">
+    <pre><code>Feature: Booking Zone Management
+
+  @api @booking-zones
+  Scenario: Create a booking zone with valid data
+    Given the professional is authenticated
+    And an active event exists for today
+    When I create a booking zone with:
+      | name       | VIP Lounge   |
+      | capacity   | 50           |
+      | minSpend   | 200          |
+    Then the response status should be 200
+    And the zone should appear in the event's zone list
+
+  @api @booking-zones
+  Scenario: Create a booking in the zone
+    Given the professional is authenticated
+    And a booking zone "VIP Lounge" exists
+    When I create a booking with:
+      | clientName  | Test Client  |
+      | pax         | 4            |
+      | zone        | VIP Lounge   |
+    Then the response status should be 200
+    And the booking status should be "confirmed"</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="api_h2_service">Service layer pattern</h2>
+  <p data-i18n="api_p_service">
+    Each API domain gets a dedicated service class. The service handles
+    endpoint URLs, request construction, and response typing. Step definitions
+    stay clean — they only orchestrate calls and assertions.
+  </p>
+
+  <Terminal filename="services/bookingService.ts">
+    <pre><code>import &#123; AxiosInstance &#125; from 'axios';
+import &#123; BookingZone, Booking, BookingStatus &#125; from '../types';
+
+export enum BookingEndpoints &#123;
+  ZONES = '/reservas_zonas',
+  BOOKINGS = '/reservados',
+  STATUS = '/reservados_estado',
+  MAP = '/listado_reservados_mapa',
+&#125;
+
+export class BookingService &#123;
+  constructor(private api: AxiosInstance) &#123;&#125;
+
+  async createZone(eventId: string, zone: Partial&lt;BookingZone&gt;) &#123;
+    const response = await this.api.post(BookingEndpoints.ZONES, &#123;
+      eventId,
+      ...zone,
+    &#125;);
+    return response.data;
+  &#125;
+
+  async createBooking(booking: Partial&lt;Booking&gt;) &#123;
+    const response = await this.api.post(
+      BookingEndpoints.BOOKINGS,
+      booking
+    );
+    return response.data;
+  &#125;
+
+  async updateStatus(bookingId: string, status: BookingStatus) &#123;
+    const response = await this.api.put(
+      `$&#123;BookingEndpoints.STATUS&#125;`,
+      &#123; id: bookingId, status &#125;
+    );
+    return response.data;
+  &#125;
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="api_h2_steps">Step definitions</h2>
+  <Terminal filename="steps/zona_reserva.ts">
+    <pre><code>import &#123; When, Then &#125; from '@cucumber/cucumber';
+import &#123; strict as assert &#125; from 'node:assert';
+import &#123; FvContext &#125; from '../support/fvContext';
+
+When('I create a booking zone with:', async function (
+  this: FvContext,
+  dataTable
+) &#123;
+  const data = dataTable.rowsHash();
+  this.response = await this.bookingService.createZone(
+    this.currentEventId,
+    &#123;
+      name: data.name,
+      capacity: Number(data.capacity),
+      minSpend: Number(data.minSpend),
+    &#125;
+  );
+  this.currentZoneId = this.response.id;
+&#125;);
+
+Then('the zone should appear in the event\'s zone list',
+  async function (this: FvContext) &#123;
+    const zones = await this.bookingService.getZones(
+      this.currentEventId
+    );
+    const found = zones.find(z =&gt; z.id === this.currentZoneId);
+    assert.ok(found,
+      `Zone $&#123;this.currentZoneId&#125; not found in event zones`
+    );
+  &#125;
+);</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="api_li1"><strong>Typed services</strong> — every endpoint wrapped in a typed class, endpoints as enums</li>
+    <li data-i18n="api_li2"><strong>Shared context</strong> — Cucumber world object (<code>FvContext</code>) carries state between steps</li>
+    <li data-i18n="api_li3"><strong>Custom assertions</strong> — <code>assert.strictEqual()</code> with descriptive error messages over <code>expect().toBe()</code></li>
+    <li data-i18n="api_li4"><strong>Chained flows</strong> — create → book → pay → verify, each step reusing previous response data</li>
+    <li data-i18n="api_li5"><strong>Environment-aware config</strong> — base URLs, auth tokens, and test data configurable per environment</li>
+  </ul>
+
+</SkillLayout>

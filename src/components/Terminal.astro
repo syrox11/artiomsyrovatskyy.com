@@ -1,0 +1,20 @@
+---
+interface Props {
+  title?: string;
+  filename?: string;
+}
+
+const { title = 'Terminal', filename } = Astro.props;
+---
+
+<div class="terminal" role="region" aria-label={`Code example: ${filename || title}`}>
+  <div class="terminal__header" aria-hidden="true">
+    <span class="terminal__dot terminal__dot--red"></span>
+    <span class="terminal__dot terminal__dot--yellow"></span>
+    <span class="terminal__dot terminal__dot--green"></span>
+    <span class="terminal__title">{filename || title}</span>
+  </div>
+  <div class="terminal__body">
+    <slot />
+  </div>
+</div>

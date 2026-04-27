@@ -1,0 +1,106 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="Playwright & E2E Testing"
+  description="End-to-end test automation with Playwright — cross-browser, parallel execution, and Page Object Model architecture."
+  tags={['Playwright', 'TypeScript', 'POM', 'Cross-browser', 'CI/CD']}
+  level="daily"
+  experience="3+ years E2E testing"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="pw_p_how">
+    Playwright is my primary E2E testing tool. I build test suites that cover full user flows
+    across Chromium, Firefox, and WebKit — running in parallel with isolated browser contexts.
+    Every suite follows a Page Object Model architecture for maintainability and reuse.
+  </p>
+
+  <h2 data-i18n="pw_h2_example">Real example: Login flow test</h2>
+  <p data-i18n="pw_p_example">
+    This is a simplified version of a real login flow test. Notice the POM pattern —
+    the test reads like a user story, while the page object handles DOM selectors and interactions.
+  </p>
+
+  <Terminal filename="tests/auth/login.spec.ts">
+    <pre><code>import &#123; test, expect &#125; from '@playwright/test';
+import &#123; LoginPage &#125; from '../pages/LoginPage';
+import &#123; DashboardPage &#125; from '../pages/DashboardPage';
+
+test.describe('Authentication', () =&gt; &#123;
+  let loginPage: LoginPage;
+  let dashboardPage: DashboardPage;
+
+  test.beforeEach(async (&#123; page &#125;) =&gt; &#123;
+    loginPage = new LoginPage(page);
+    dashboardPage = new DashboardPage(page);
+    await loginPage.navigate();
+  &#125;);
+
+  test('valid credentials redirect to dashboard', async () =&gt; &#123;
+    await loginPage.login('admin@test.com', 'securePass123');
+
+    await expect(dashboardPage.welcomeMessage).toBeVisible();
+    await expect(dashboardPage.welcomeMessage)
+      .toHaveText(/Welcome, Admin/);
+  &#125;);
+
+  test('invalid credentials show error', async () =&gt; &#123;
+    await loginPage.login('wrong@test.com', 'badpass');
+
+    await expect(loginPage.errorAlert).toBeVisible();
+    await expect(loginPage.errorAlert)
+      .toContainText('Invalid credentials');
+  &#125;);
+&#125;);</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="pw_h2_pom">Page Object pattern</h2>
+  <p data-i18n="pw_p_pom">
+    Every page in the application gets a corresponding class that encapsulates
+    selectors and actions. This makes tests resilient to UI changes — if a selector
+    changes, I fix it in one place.
+  </p>
+
+  <Terminal filename="pages/LoginPage.ts">
+    <pre><code>import &#123; type Page, type Locator &#125; from '@playwright/test';
+
+export class LoginPage &#123;
+  readonly page: Page;
+  readonly emailInput: Locator;
+  readonly passwordInput: Locator;
+  readonly submitButton: Locator;
+  readonly errorAlert: Locator;
+
+  constructor(page: Page) &#123;
+    this.page = page;
+    this.emailInput = page.getByLabel('Email');
+    this.passwordInput = page.getByLabel('Password');
+    this.submitButton = page.getByRole('button', &#123; name: 'Sign in' &#125;);
+    this.errorAlert = page.getByRole('alert');
+  &#125;
+
+  async navigate() &#123;
+    await this.page.goto('/login');
+  &#125;
+
+  async login(email: string, password: string) &#123;
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.submitButton.click();
+  &#125;
+&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="pw_li1"><strong>Stable selectors</strong> — <code>getByRole</code>, <code>getByLabel</code>, and <code>getByTestId</code> over fragile CSS selectors</li>
+    <li data-i18n="pw_li2"><strong>Test isolation</strong> — each test gets its own browser context, no shared state leaks</li>
+    <li data-i18n="pw_li3"><strong>Parallel execution</strong> — Playwright's built-in parallelism with configurable worker count</li>
+    <li data-i18n="pw_li4"><strong>CI integration</strong> — headless runs in GitHub Actions with artifact collection on failure</li>
+    <li data-i18n="pw_li5"><strong>Visual regression</strong> — screenshot comparisons for critical UI components</li>
+  </ul>
+
+</SkillLayout>

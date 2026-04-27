@@ -1,0 +1,181 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+  level: 'daily' | 'frequent' | 'familiar';
+  experience: string;
+}
+
+const { title, description, tags, level, experience } = Astro.props;
+
+import BaseLayout from './BaseLayout.astro';
+
+const levelLabels = {
+  daily: 'Daily driver',
+  frequent: 'Frequent use',
+  familiar: 'Familiar',
+};
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="skill-page container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/" data-i18n="breadcrumb_home">Home</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+      <a href="/#skills" data-i18n="breadcrumb_skills">Skills</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+      <span class="breadcrumb__current" aria-current="page">{title}</span>
+    </nav>
+
+    <!-- Hero -->
+    <header class="skill-hero">
+      <div class="skill-hero__meta">
+        <span class="status" data-i18n={`level_${level}`}>{levelLabels[level]}</span>
+        <span class="tag--neutral tag">{experience}</span>
+      </div>
+      <h1 class="skill-hero__title">{title}</h1>
+      <p class="skill-hero__description">{description}</p>
+      <div class="skill-hero__tags">
+        {tags.map(tag => <span class="tag">{tag}</span>)}
+      </div>
+    </header>
+
+    <hr class="divider" />
+
+    <!-- Content from the page -->
+    <div class="skill-content">
+      <slot />
+    </div>
+
+    <!-- Back link -->
+    <div class="skill-back">
+      <a href="/#skills" data-i18n="back_link">&larr; All skills</a>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .skill-page {
+    padding-top: calc(var(--nav-height) + var(--space-xl));
+    padding-bottom: var(--space-2xl);
+    position: relative;
+    z-index: 1;
+  }
+
+  .breadcrumb {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: var(--space-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .breadcrumb a {
+    color: var(--text-muted);
+    transition: color 0.3s;
+  }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb__sep { opacity: 0.3; }
+  .breadcrumb__current { color: var(--text-secondary); }
+
+  .skill-hero {
+    margin-bottom: var(--space-xl);
+    position: relative;
+  }
+
+  .skill-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .skill-hero__title {
+    margin-bottom: var(--space-md);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .skill-hero__description {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 620px;
+    margin-bottom: var(--space-lg);
+    line-height: 1.8;
+  }
+
+  .skill-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .skill-content {
+    max-width: 780px;
+  }
+
+  .skill-content :global(h2) {
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-md);
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .skill-content :global(h3) {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-sm);
+    font-weight: 700;
+  }
+
+  .skill-content :global(p) {
+    margin-bottom: var(--space-md);
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .skill-content :global(pre) { margin: var(--space-lg) 0; }
+
+  .skill-content :global(ul),
+  .skill-content :global(ol) {
+    margin-bottom: var(--space-md);
+    padding-left: var(--space-lg);
+    color: var(--text-secondary);
+  }
+
+  .skill-content :global(li) {
+    margin-bottom: var(--space-sm);
+    line-height: 1.75;
+    position: relative;
+  }
+
+  .skill-back {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+  }
+
+  .skill-back a {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    transition: color 0.3s;
+  }
+  .skill-back a:hover { color: var(--accent); }
+</style>

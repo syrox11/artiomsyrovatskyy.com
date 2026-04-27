@@ -1,0 +1,21 @@
+{
+  "name": "artiom-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "review": "node agente.js reviewer",
+    "check": "node agente.js gate",
+    "gen": "node agente.js generator"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "dotenv": "^17.4.2",
+    "openai": "^6.34.0"
+    
+  } 
+}
+

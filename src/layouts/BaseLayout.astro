@@ -1,0 +1,506 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'QA Automation Engineer — Playwright, TypeScript, API Testing, BDD' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = `${title} — Artiom Syrovatskyy`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Artiom Syrovatskyy",
+      "jobTitle": "QA Automation Engineer",
+      "url": "https://artiomsyrovatskyy.com",
+      "sameAs": [
+        "https://github.com/artiomsyrovatskyy",
+        "https://linkedin.com/in/artiomsyrovatskyy"
+      ]
+    })} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <nav class="nav" aria-label="Main navigation">
+      <div class="container nav__inner">
+        <a href="/" class="nav__logo">
+          <span class="nav__logo-symbol">&gt;</span> artiom<span class="nav__logo-accent">.qa</span>
+        </a>
+        <div class="nav__links">
+          <a href="/#skills" data-i18n="nav_skills">Skills</a>
+          <a href="/#experience" data-i18n="nav_experience">Experience</a>
+          <a href="/#contact" data-i18n="nav_contact">Contact</a>
+          <a href="https://github.com/artiomsyrovatskyy" target="_blank" rel="noopener">GitHub</a>
+          <div class="nav__lang">
+            <button class="nav__lang-btn" data-lang="es">ES</button>
+            <button class="nav__lang-btn" data-lang="en">EN</button>
+            <button class="nav__lang-btn" data-lang="fr">FR</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p class="footer__text">Built with Astro — managed by AI agents — tested by me.</p>
+        <div class="footer__links">
+          <a href="https://github.com/artiomsyrovatskyy" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://linkedin.com/in/artiomsyrovatskyy" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--accent);
+    color: #0a0a0f;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: var(--border-radius);
+    z-index: 9999;
+    transition: top 0.2s;
+  }
+  .skip-link:focus { top: var(--space-md); }
+
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(10,10,15,0.75);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+  }
+
+  .nav__logo {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  .nav__logo-symbol { color: var(--accent); }
+  .nav__logo-accent { color: var(--accent); }
+
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .nav__links a {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 2px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav__links a:hover { color: var(--text-primary); }
+  .nav__links a:hover::after { width: 100%; }
+
+  .nav__lang {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    margin-left: var(--space-sm);
+  }
+
+  .nav__lang-btn {
+    background: transparent;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 9px;
+    border-radius: 5px;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+  }
+  .nav__lang-btn:hover:not(.active) {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+  }
+  .nav__lang-btn.active {
+    background: var(--accent);
+    color: #0a0a0f;
+  }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-2xl);
+    position: relative;
+    z-index: 1;
+  }
+  .footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer__text { font-size: 0.8rem; color: var(--text-muted); }
+  .footer__links { display: flex; gap: var(--space-lg); }
+  .footer__links a { font-size: 0.8rem; color: var(--text-secondary); }
+
+  @media (max-width: 640px) {
+    .nav__links { gap: var(--space-md); }
+    .nav__lang  { margin-left: 0; }
+    .footer__inner {
+      flex-direction: column;
+      gap: var(--space-md);
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+(function () {
+  const t = {
+    es: {
+      // chrome
+      nav_skills:'Skills', nav_experience:'Experiencia', nav_contact:'Contacto',
+      breadcrumb_home:'Inicio', breadcrumb_skills:'Skills',
+      level_daily:'Uso diario', level_frequent:'Uso frecuente', level_familiar:'Familiarizado',
+      back_link:'← Todos los skills',
+      // shared headings
+      h_how:'Cómo lo uso', h_focus:'En qué me enfoco',
+      // playwright
+      pw_p_how:'Playwright es mi herramienta principal de testing E2E. Construyo suites de pruebas que cubren flujos completos de usuario en Chromium, Firefox y WebKit — ejecutándose en paralelo con contextos de navegador aislados. Cada suite sigue una arquitectura Page Object Model para facilitar el mantenimiento y la reutilización.',
+      pw_h2_example:'Ejemplo real: prueba del flujo de login',
+      pw_p_example:'Esta es una versión simplificada de una prueba real de flujo de login. Observa el patrón POM — el test se lee como una historia de usuario, mientras el page object gestiona los selectores DOM y las interacciones.',
+      pw_h2_pom:'Patrón Page Object',
+      pw_p_pom:'Cada página de la aplicación tiene una clase correspondiente que encapsula selectores y acciones. Esto hace que las pruebas sean resistentes a cambios de UI — si un selector cambia, lo corrijo en un solo lugar.',
+      pw_li1:'<strong>Selectores estables</strong> — <code>getByRole</code>, <code>getByLabel</code> y <code>getByTestId</code> frente a selectores CSS frágiles',
+      pw_li2:'<strong>Aislamiento de pruebas</strong> — cada prueba tiene su propio contexto de navegador, sin filtraciones de estado compartido',
+      pw_li3:'<strong>Ejecución en paralelo</strong> — paralelismo nativo de Playwright con número de workers configurable',
+      pw_li4:'<strong>Integración CI</strong> — ejecuciones headless en GitHub Actions con recolección de artefactos ante fallos',
+      pw_li5:'<strong>Regresión visual</strong> — comparaciones de capturas de pantalla para componentes UI críticos',
+      // api-testing
+      api_p_how:'Construyo suites de pruebas API que van más allá de comprobar códigos de estado básicos. Mi enfoque combina Cucumber/Gherkin para escenarios legibles con servicios TypeScript que gestionan autenticación, encadenamiento de peticiones y validación de respuestas. En Fourvenues, esto cubre flujos de reserva, procesamiento de pagos y endpoints de gestión de eventos.',
+      api_h2_example:'Ejemplo real: creación de zona de reserva',
+      api_p_example:'Esto está basado en un escenario de prueba real de la plataforma Fourvenues. El escenario Gherkin describe el flujo de negocio, mientras las definiciones de pasos llaman a una capa de servicios tipada.',
+      api_h2_service:'Patrón de capa de servicios',
+      api_p_service:'Cada dominio API tiene una clase de servicio dedicada. El servicio gestiona las URLs de los endpoints, la construcción de peticiones y el tipado de respuestas. Las definiciones de pasos se mantienen limpias — solo orquestan llamadas y aserciones.',
+      api_h2_steps:'Definiciones de pasos',
+      api_li1:'<strong>Servicios tipados</strong> — cada endpoint envuelto en una clase tipada, endpoints como enums',
+      api_li2:'<strong>Contexto compartido</strong> — el objeto world de Cucumber (<code>FvContext</code>) transporta el estado entre pasos',
+      api_li3:'<strong>Aserciones personalizadas</strong> — <code>assert.strictEqual()</code> con mensajes descriptivos frente a <code>expect().toBe()</code>',
+      api_li4:'<strong>Flujos encadenados</strong> — crear → reservar → pagar → verificar, cada paso reutilizando datos de la respuesta anterior',
+      api_li5:'<strong>Configuración por entorno</strong> — URLs base, tokens de autenticación y datos de prueba configurables por entorno',
+      // bdd-gherkin
+      bdd_p_how:'BDD con Cucumber me permite escribir tests que funcionan como especificaciones ejecutables. Los archivos feature se escriben antes de la implementación — definen el contrato en lenguaje natural que stakeholders, desarrolladores y QAs pueden leer y cuestionar. Las definiciones de pasos respaldan cada escenario con llamadas HTTP reales y aserciones tipadas, y una clase <code>World</code> fuertemente tipada mantiene el estado del escenario explícito y seguro.',
+      bdd_h2_feature:'Archivo feature: flujo de reserva en restaurante',
+      bdd_p_feature:'Cada escenario cubre una parte concreta del dominio de reservas — crear, cancelar, modificar, rechazo por horario y conflicto de disponibilidad. El bloque <code>Background</code> gestiona las precondiciones compartidas para que los escenarios individuales se centren en la variación que se prueba.',
+      bdd_h2_world:'World context — estado compartido tipado',
+      bdd_p_world:'La clase <code>World</code> contiene todo el estado que comparten los pasos dentro de un escenario. Tiparlo en TypeScript fuerza la intención explícita — si un paso escribe <code>bookingId</code>, el siguiente paso que lo lea obtendrá un error de compilación si el campo no existe en <code>World</code>. La instancia de Axios también vive aquí, preconfigurada con la URL base y un validador de estado permisivo.',
+      bdd_h2_steps:'Definiciones de pasos',
+      bdd_p_steps:'Los pasos importan el <code>BookingWorld</code> tipado y usan <code>this</code> para leer y escribir estado compartido en un escenario. Cada paso hace exactamente una aserción o un efecto secundario — esto mantiene los fallos precisos y legibles sin revisar stack traces. Prefiero <code>assert.strictEqual</code> por su salida inequívoca.',
+      bdd_h2_hooks:'Hooks: health check, trazabilidad y limpieza',
+      bdd_p_hooks:'Los hooks gestionan las preocupaciones de infraestructura separadas de la lógica de negocio. <code>BeforeAll</code> protege toda la ejecución contra un entorno caído. <code>Before</code> adjunta un ID de correlación a cada llamada API. <code>After</code> elimina cualquier reserva creada durante el escenario — independientemente del resultado. <code>AfterAll</code> señala a la API que purgue los datos de prueba huérfanos.',
+      bdd_li1:'<strong>Escenarios como especificaciones</strong> — los archivos feature se escriben antes de la implementación; definen el contrato, no solo lo verifican',
+      bdd_li2:'<strong>World tipado</strong> — compartir estado a través de una clase fuertemente tipada detecta errores de integración en tiempo de compilación, no en CI a medianoche',
+      bdd_li3:'<strong>Una aserción por Then</strong> — los nombres de paso precisos generan mensajes de fallo legibles; sabes exactamente qué falló sin leer un stack trace',
+      bdd_li4:'<strong>Limpieza idempotente</strong> — el hook After siempre se ejecuta incluso ante fallos, por lo que los entornos permanecen consistentes en toda la suite',
+      bdd_li5:'<strong>Scenario Outlines para variación de datos</strong> — las tablas reemplazan escenarios duplicados manteniendo Gherkin como única fuente de verdad',
+      bdd_li6:'<strong>Hooks para infraestructura, pasos para lógica de negocio</strong> — los health checks van en hooks; la autenticación y las acciones de dominio van en pasos',
+      // cicd
+      ci_p_how:'CI/CD es la columna vertebral de una suite de pruebas fiable. Un test que pasa en la máquina de un desarrollador no significa nada si nunca se ejecuta en un entorno limpio contra el build real. Integro Playwright, Cucumber y pruebas API en pipelines de GitHub Actions para que cada pull request se valide antes de tocar main — y los despliegues solo ocurren cuando todos los quality gates pasan.',
+      ci_h2_pipeline:'Pipeline: validación de pull request',
+      ci_p_pipeline:'Este es el pipeline de PR principal. Se ejecuta en paralelo — pruebas unitarias/API y pruebas E2E en jobs separados para que el feedback rápido llegue antes de que terminen las pruebas de navegador más lentas. El job <code>deploy</code> está bloqueado hasta que ambos pasen.',
+      ci_h2_gate:'Job de quality gate',
+      ci_p_gate:'Un job de quality gate dedicado se ejecuta tras el despliegue y bloquea la promoción a producción si alguna comprobación falla. Ejecuta Lighthouse contra la URL de staging real y falla el pipeline si las puntuaciones caen por debajo de los umbrales — detectando regresiones introducidas por el build, no solo por el código.',
+      ci_h2_budget:'Configuración del presupuesto Lighthouse',
+      ci_p_budget:'Los umbrales de puntuación se versionan como código para que todos los colaboradores conozcan el estándar. Si un PR introduce una dependencia pesada que degrada el rendimiento, el pipeline lo detecta antes del merge — no después de que un usuario se queje.',
+      ci_h2_artifacts:'Gestión de artefactos ante fallos',
+      ci_p_artifacts:'Los artefactos se suben incondicionalmente con <code>if: always()</code> — así cuando una prueba falla en CI y la ejecución desaparece por la mañana, el trace, las capturas y el informe HTML siguen disponibles. Esto solo ha ahorrado horas de depuración del tipo "no puedo reproducirlo en local".',
+      ci_li1:'<strong>Secretos nunca en el código</strong> — todas las credenciales van a través de GitHub Secrets o variables de entorno; el YAML del workflow siempre es seguro para commitear',
+      ci_li2:'<strong>Jobs en paralelo</strong> — las pruebas rápidas y lentas se ejecutan concurrentemente; los desarrolladores reciben feedback sobre pruebas API en ~2 min mientras las E2E siguen ejecutándose',
+      ci_li3:'<strong>Artefactos en cada fallo</strong> — traces, capturas e informes se suben incondicionalmente para que los fallos intermitentes dejen evidencia forense',
+      ci_li4:'<strong>Quality gates como código</strong> — los presupuestos de Lighthouse y los umbrales de smoke tests se versionan junto a la aplicación, no se configuran en un dashboard',
+      ci_li5:'<strong>Gates de promoción por entorno</strong> — staging y producción son GitHub Environments separados; la promoción requiere pasar el quality gate, no solo aprobación manual',
+      // sql
+      sql_p_how:'SQL es donde valido lo que la aplicación no puede ver por sí misma. Una API puede devolver 200 y aun así dejar la base de datos en un estado corrupto — una reserva confirmada sin la fila de pago correspondiente, un usuario eliminado cuyos registros no se han propagado. Escribo consultas de validación de datos como parte de la suite de pruebas para verificar directamente la fuente de verdad.',
+      sql_h2_integrity:'Comprobación de integridad tras un flujo de reserva',
+      sql_p_integrity:'Tras crear una reserva en una prueba E2E o API, estos helpers verifican que la base de datos refleja el estado esperado — no solo que la respuesta lo afirme. Implementarlo en un helper TypeScript lo mantiene composable y tipado.',
+      sql_h2_migration:'Comprobación de integridad de migración',
+      sql_p_migration:'Antes de ejecutar una migración en staging, valido que las restricciones, índices y claves foráneas coincidan con el esquema esperado. Este patrón detecta casos en los que una migración se aplica sin errores pero deja el esquema en una forma diferente a la que espera el código base.',
+      sql_h2_bulk:'Aserción de conteo de filas tras una operación masiva',
+      sql_p_bulk:'Las operaciones masivas — importaciones, jobs programados, migraciones de datos — son fáciles de verificar en la capa API pero la API normalmente solo devuelve un conteo resumen. Verifico directamente en la tabla para detectar fallos parciales silenciosos.',
+      sql_li1:'<strong>Verificar la fuente de verdad</strong> — las respuestas API reflejan el estado de la aplicación; la base de datos es el estado real. Ambos deben coincidir.',
+      sql_li2:'<strong>Consultas parametrizadas siempre</strong> — los helpers que construyen consultas con interpolación de strings son un vector de SQL injection, incluso en entornos de prueba.',
+      sql_li3:'<strong>Validación de migración como paso pre-despliegue</strong> — las aserciones de esquema se ejecutan antes de que la aplicación arranque en staging, no después de que aparezca un error críptico en runtime.',
+      sql_li4:'<strong>Verificación de cascadas</strong> — las operaciones de borrado y cancelación necesitan comprobaciones explícitas de que las filas relacionadas se actualizaron o liberaron.',
+      sql_li5:'<strong>Limpieza del pool de conexiones</strong> — los helpers llaman a <code>pool.end()</code> en un hook <code>afterAll</code> para evitar procesos de prueba colgados por conexiones DB abiertas.',
+      // typescript
+      ts_p_how:'TypeScript es la capa que hace que un framework de testing sea mantenible a escala. Sin él, un campo de API renombrado rompe silenciosamente diez definiciones de pasos y solo te enteras en CI. Con él, el compilador detecta la ruptura en el momento en que cambia la interfaz. Uso strict mode, tipos de retorno explícitos y utility types para construir helpers de prueba difíciles de usar incorrectamente.',
+      ts_h2_wrapper:'Wrapper tipado de respuesta API',
+      ts_p_wrapper:'Un wrapper genérico de respuesta mantiene cada llamada API consistente — estado, cuerpo y latencia en una forma tipada. Las definiciones de pasos y las aserciones trabajan contra este tipo en lugar de respuestas Axios crudas, así que si el wrapper cambia, TypeScript marca inmediatamente cada punto de llamada afectado.',
+      ts_h2_request:'Helper de petición genérico',
+      ts_p_request:'Un único wrapper tipado alrededor de Axios da a cada prueba un manejo de errores consistente y seguimiento de latencia sin repetir el mismo boilerplate en cada paso. El parámetro genérico <code>T</code> fluye hasta el tipo de retorno para que los llamadores tengan autocompletado completo en <code>res.body</code>.',
+      ts_h2_factory:'Utility types en factorías de prueba',
+      ts_p_factory:'Los utility types eliminan las interfaces duplicadas. <code>CreateBookingPayload</code> se deriva del tipo completo <code>Booking</code> — si se añade un campo obligatorio al modelo de dominio, la factoría falla en tiempo de compilación en lugar de producir silenciosamente una petición inválida.',
+      ts_h2_pom:'Page Object tipado con localizadores estrictos',
+      ts_p_pom:'Las clases Page Object declaran los localizadores como <code>readonly</code> para que nada fuera de la clase pueda reasignarlos. El constructor es el único lugar donde viven los selectores — corregir un selector roto es un cambio de una línea sin riesgo de perderse ninguna ocurrencia en otro lugar.',
+      ts_li1:'<strong>Strict mode en todas partes</strong> — <code>"strict": true</code> en <code>tsconfig.json</code> detecta desreferencias nulas e <code>any</code> implícito antes de que se conviertan en fallos en runtime',
+      ts_li2:'<strong>Derivar tipos, no duplicarlos</strong> — <code>Pick</code>, <code>Partial</code>, <code>Omit</code> y <code>Record</code> mantienen los tipos de payload sincronizados con las interfaces de dominio automáticamente',
+      ts_li3:'<strong>Tipos de retorno explícitos en helpers</strong> — los llamadores ven el contrato sin leer la implementación; TypeScript garantiza que no diverja',
+      ts_li4:'<strong>Type guards frente a casting</strong> — <code>isApiError(body)</code> estrecha el tipo de forma segura; <code>body as ApiError</code> solo suprime el error y oculta el bug',
+      ts_li5:'<strong>Readonly en localizadores de Page Object</strong> — evita la reasignación accidental y señala que son referencias estables, no estado mutable',
+    },
+    en: {
+      nav_skills:'Skills', nav_experience:'Experience', nav_contact:'Contact',
+      breadcrumb_home:'Home', breadcrumb_skills:'Skills',
+      level_daily:'Daily driver', level_frequent:'Frequent use', level_familiar:'Familiar',
+      back_link:'← All skills',
+      h_how:'How I use it', h_focus:'What I focus on',
+      pw_p_how:'Playwright is my primary E2E testing tool. I build test suites that cover full user flows across Chromium, Firefox, and WebKit — running in parallel with isolated browser contexts. Every suite follows a Page Object Model architecture for maintainability and reuse.',
+      pw_h2_example:'Real example: Login flow test',
+      pw_p_example:'This is a simplified version of a real login flow test. Notice the POM pattern — the test reads like a user story, while the page object handles DOM selectors and interactions.',
+      pw_h2_pom:'Page Object pattern',
+      pw_p_pom:'Every page in the application gets a corresponding class that encapsulates selectors and actions. This makes tests resilient to UI changes — if a selector changes, I fix it in one place.',
+      pw_li1:'<strong>Stable selectors</strong> — <code>getByRole</code>, <code>getByLabel</code>, and <code>getByTestId</code> over fragile CSS selectors',
+      pw_li2:'<strong>Test isolation</strong> — each test gets its own browser context, no shared state leaks',
+      pw_li3:'<strong>Parallel execution</strong> — Playwright\'s built-in parallelism with configurable worker count',
+      pw_li4:'<strong>CI integration</strong> — headless runs in GitHub Actions with artifact collection on failure',
+      pw_li5:'<strong>Visual regression</strong> — screenshot comparisons for critical UI components',
+      api_p_how:'I build API test suites that go beyond basic status code checks. My approach combines Cucumber/Gherkin for readable scenarios with TypeScript services that handle authentication, request chaining, and response validation. At Fourvenues, this covers booking flows, payment processing, and event management endpoints.',
+      api_h2_example:'Real example: Booking zone creation',
+      api_p_example:'This is based on a real test scenario from the Fourvenues platform. The Gherkin scenario describes the business flow, while the step definitions call a typed service layer.',
+      api_h2_service:'Service layer pattern',
+      api_p_service:'Each API domain gets a dedicated service class. The service handles endpoint URLs, request construction, and response typing. Step definitions stay clean — they only orchestrate calls and assertions.',
+      api_h2_steps:'Step definitions',
+      api_li1:'<strong>Typed services</strong> — every endpoint wrapped in a typed class, endpoints as enums',
+      api_li2:'<strong>Shared context</strong> — Cucumber world object (<code>FvContext</code>) carries state between steps',
+      api_li3:'<strong>Custom assertions</strong> — <code>assert.strictEqual()</code> with descriptive error messages over <code>expect().toBe()</code>',
+      api_li4:'<strong>Chained flows</strong> — create → book → pay → verify, each step reusing previous response data',
+      api_li5:'<strong>Environment-aware config</strong> — base URLs, auth tokens, and test data configurable per environment',
+      bdd_p_how:'BDD with Cucumber lets me write tests that serve as executable specifications. Feature files are written before implementation — they define the contract in plain language that stakeholders, developers, and QAs can all read and challenge. Step definitions back each scenario with real HTTP calls and typed assertions, and a strongly-typed <code>World</code> class keeps scenario state explicit and safe.',
+      bdd_h2_feature:'Feature file: restaurant booking flow',
+      bdd_p_feature:'Each scenario covers a distinct slice of the booking domain — create, cancel, modify, operating-hours rejection, and availability conflict. The <code>Background</code> block handles shared pre-conditions so individual scenarios stay focused on the variation being tested.',
+      bdd_h2_world:'World context — typed shared state',
+      bdd_p_world:'The <code>World</code> class holds all state that steps share within a scenario. Typing it in TypeScript forces explicit intent — if a step writes <code>bookingId</code>, the next step that reads it gets a compile error if the field doesn\'t exist on <code>World</code>. The Axios instance lives here too, pre-configured with the base URL and a permissive status validator.',
+      bdd_h2_steps:'Step definitions',
+      bdd_p_steps:'Steps import the typed <code>BookingWorld</code> and use <code>this</code> to read and write shared state across a scenario. Each step makes exactly one assertion or one side effect — this keeps failures precise and readable without digging into stack traces. I prefer <code>assert.strictEqual</code> for its unambiguous output.',
+      bdd_h2_hooks:'Hooks: health check, tracing, and cleanup',
+      bdd_p_hooks:'Hooks handle infrastructure concerns separately from business logic. <code>BeforeAll</code> guards the entire run against a dead environment. <code>Before</code> attaches a correlation ID to every API call. <code>After</code> deletes any booking created during the scenario — regardless of pass or fail. <code>AfterAll</code> signals the API to purge any orphaned test data.',
+      bdd_li1:'<strong>Scenarios as specifications</strong> — feature files are written before implementation; they define the contract, not just verify it',
+      bdd_li2:'<strong>Typed World</strong> — sharing state through a strongly-typed class surfaces integration errors at compile time, not in CI at midnight',
+      bdd_li3:'<strong>One assertion per Then</strong> — precise step names produce readable failure messages; you know exactly what broke without reading a stack trace',
+      bdd_li4:'<strong>Idempotent cleanup</strong> — the After hook always runs even on failure, so environments stay consistent across the full suite',
+      bdd_li5:'<strong>Scenario Outlines for data variation</strong> — tables replace copy-paste scenarios while keeping Gherkin as the single source of truth',
+      bdd_li6:'<strong>Hooks for infrastructure, steps for business logic</strong> — health checks live in hooks; authentication and domain actions live in steps',
+      ci_p_how:'CI/CD is the backbone of a trustworthy test suite. A passing test on a developer\'s machine means nothing if it never runs on a clean environment against the real build. I wire Playwright, Cucumber, and API tests into GitHub Actions pipelines so every pull request is validated before it touches main — and deployments only happen when all quality gates pass.',
+      ci_h2_pipeline:'Pipeline: pull request validation',
+      ci_p_pipeline:'This is the core PR pipeline. It runs in parallel — unit/API tests and E2E tests on separate jobs so fast feedback arrives before the slower browser tests finish. The <code>deploy</code> job is blocked until both pass.',
+      ci_h2_gate:'Quality gate job',
+      ci_p_gate:'A dedicated quality gate job runs after deployment and blocks promotion to production if any check fails. It runs Lighthouse against the live staging URL and fails the pipeline if scores drop below thresholds — catching regressions introduced by the build itself, not just the code.',
+      ci_h2_budget:'Lighthouse budget config',
+      ci_p_budget:'Score thresholds are committed as code so every contributor knows the bar. If a PR introduces a heavy dependency that tanks performance, the pipeline catches it before merge — not after a user complains.',
+      ci_h2_artifacts:'Handling test artifacts on failure',
+      ci_p_artifacts:'Artifacts are uploaded unconditionally with <code>if: always()</code> — so when a test fails in CI and the run is gone by morning, the trace, screenshots, and HTML report are still there. This alone has saved hours of "I can\'t reproduce it locally" debugging.',
+      ci_li1:'<strong>Secrets never in code</strong> — all credentials go through GitHub Secrets or environment variables; the workflow YAML is always safe to commit',
+      ci_li2:'<strong>Parallel jobs</strong> — fast and slow tests run concurrently; developers get feedback on API tests in ~2 min while E2E tests are still running',
+      ci_li3:'<strong>Artifacts on every failure</strong> — traces, screenshots, and reports are uploaded unconditionally so flaky failures leave forensic evidence',
+      ci_li4:'<strong>Quality gates as code</strong> — Lighthouse budgets and smoke test thresholds are versioned alongside the application, not configured in a dashboard',
+      ci_li5:'<strong>Environment promotion gates</strong> — staging and production are separate GitHub Environments; promotion requires explicit quality gate passage, not manual approval alone',
+      sql_p_how:'SQL is where I validate what the application can\'t see itself. An API can return 200 and still leave the database in a corrupt state — a booking confirmed with no corresponding payment row, a deleted user whose records weren\'t cascaded. I write data validation queries as part of the test suite to assert on the source of truth directly, not just on what the UI reflects.',
+      sql_h2_integrity:'Data integrity check after a booking flow',
+      sql_p_integrity:'After an E2E or API test creates a booking, these helpers assert that the database reflects the expected state — not just that the response said it did. Running this in a TypeScript helper keeps it composable and typed.',
+      sql_h2_migration:'Migration integrity check',
+      sql_p_migration:'Before running a migration in staging, I validate that constraints, indexes, and foreign keys match the expected schema. This query pattern catches cases where a migration applied cleanly but left the schema in a different shape than the codebase expects.',
+      sql_h2_bulk:'Row-count assertion after a bulk operation',
+      sql_p_bulk:'Bulk operations — imports, scheduled jobs, data migrations — are easy to verify at the API layer but the API often only returns a summary count. I assert directly against the table to catch silent partial failures.',
+      sql_li1:'<strong>Assert on the source of truth</strong> — API responses reflect application state; the database is the actual state. Both need to agree.',
+      sql_li2:'<strong>Parameterised queries always</strong> — test helpers that build queries with string interpolation are a SQL injection vector, even in test environments.',
+      sql_li3:'<strong>Migration validation as a pre-deploy step</strong> — schema assertions run before the application boots in staging, not after a cryptic runtime error surfaces.',
+      sql_li4:'<strong>Cascade verification</strong> — delete and cancel operations need explicit checks that related rows were updated or released, not just the primary record.',
+      sql_li5:'<strong>Connection pool cleanup</strong> — test helpers call <code>pool.end()</code> in an <code>afterAll</code> hook to avoid hanging test processes from open DB connections.',
+      ts_p_how:'TypeScript is the layer that makes a test framework maintainable at scale. Without it, a renamed API field silently breaks ten step definitions and you only find out in CI. With it, the compiler catches the breakage the moment the interface changes. I use strict mode, explicit return types, and utility types to build test helpers that are hard to misuse.',
+      ts_h2_wrapper:'Typed API response wrapper',
+      ts_p_wrapper:'A generic response wrapper keeps every API call consistent — status, body, and latency in one typed shape. Step definitions and assertions work against this type rather than raw Axios responses, so if the wrapper changes, TypeScript flags every affected call site immediately.',
+      ts_h2_request:'Generic request helper',
+      ts_p_request:'A single typed wrapper around Axios gives every test consistent error handling and latency tracking without repeating the same boilerplate in every step. The generic parameter <code>T</code> flows through to the return type so callers get full autocomplete on <code>res.body</code>.',
+      ts_h2_factory:'Utility types in test factories',
+      ts_p_factory:'Utility types eliminate copy-paste interfaces. <code>CreateBookingPayload</code> is derived from the full <code>Booking</code> type — so if a required field is added to the domain model, the factory breaks at compile time rather than silently producing an invalid request.',
+      ts_h2_pom:'Typed Page Object with strict locators',
+      ts_p_pom:'Page Object classes declare locators as <code>readonly</code> so nothing outside the class can reassign them. The constructor is the only place selectors live — fixing a broken selector is a one-line change with no risk of missing an occurrence elsewhere.',
+      ts_li1:'<strong>Strict mode everywhere</strong> — <code>"strict": true</code> in <code>tsconfig.json</code> catches null dereferences and implicit <code>any</code> before they become runtime failures',
+      ts_li2:'<strong>Derive types, don\'t duplicate them</strong> — <code>Pick</code>, <code>Partial</code>, <code>Omit</code>, and <code>Record</code> keep payload types in sync with domain interfaces automatically',
+      ts_li3:'<strong>Explicit return types on helpers</strong> — callers see the contract without reading the implementation; TypeScript enforces it doesn\'t drift',
+      ts_li4:'<strong>Type guards over casting</strong> — <code>isApiError(body)</code> narrows safely; <code>body as ApiError</code> just suppresses the error and hides the bug',
+      ts_li5:'<strong>Readonly on Page Object locators</strong> — prevents accidental reassignment and signals these are stable references, not mutable state',
+    },
+    fr: {
+      nav_skills:'Compétences', nav_experience:'Expérience', nav_contact:'Contact',
+      breadcrumb_home:'Accueil', breadcrumb_skills:'Compétences',
+      level_daily:'Usage quotidien', level_frequent:'Usage fréquent', level_familiar:'Familier',
+      back_link:'← Toutes les compétences',
+      h_how:'Comment je l\'utilise', h_focus:'Ce sur quoi je me concentre',
+      pw_p_how:'Playwright est mon outil principal de test E2E. Je construis des suites de tests couvrant les flux utilisateur complets sur Chromium, Firefox et WebKit — s\'exécutant en parallèle avec des contextes de navigateur isolés. Chaque suite suit une architecture Page Object Model pour la maintenabilité et la réutilisabilité.',
+      pw_h2_example:'Exemple concret : test du flux de connexion',
+      pw_p_example:'Voici une version simplifiée d\'un vrai test de flux de connexion. Remarquez le pattern POM — le test se lit comme une user story, tandis que le page object gère les sélecteurs DOM et les interactions.',
+      pw_h2_pom:'Pattern Page Object',
+      pw_p_pom:'Chaque page de l\'application dispose d\'une classe correspondante qui encapsule les sélecteurs et les actions. Cela rend les tests résistants aux changements d\'interface — si un sélecteur change, je le corrige à un seul endroit.',
+      pw_li1:'<strong>Sélecteurs stables</strong> — <code>getByRole</code>, <code>getByLabel</code> et <code>getByTestId</code> plutôt que des sélecteurs CSS fragiles',
+      pw_li2:'<strong>Isolation des tests</strong> — chaque test dispose de son propre contexte de navigateur, sans fuite d\'état partagé',
+      pw_li3:'<strong>Exécution en parallèle</strong> — parallélisme natif de Playwright avec un nombre de workers configurable',
+      pw_li4:'<strong>Intégration CI</strong> — exécutions headless dans GitHub Actions avec collecte d\'artefacts en cas d\'échec',
+      pw_li5:'<strong>Régression visuelle</strong> — comparaisons de captures d\'écran pour les composants UI critiques',
+      api_p_how:'Je construis des suites de tests API qui vont au-delà de la simple vérification des codes de statut. Mon approche combine Cucumber/Gherkin pour des scénarios lisibles avec des services TypeScript qui gèrent l\'authentification, le chaînage de requêtes et la validation des réponses. Chez Fourvenues, cela couvre les flux de réservation, le traitement des paiements et les endpoints de gestion d\'événements.',
+      api_h2_example:'Exemple concret : création d\'une zone de réservation',
+      api_p_example:'Ceci est basé sur un scénario de test réel de la plateforme Fourvenues. Le scénario Gherkin décrit le flux métier, tandis que les définitions d\'étapes appellent une couche de services typée.',
+      api_h2_service:'Pattern de couche de services',
+      api_p_service:'Chaque domaine API dispose d\'une classe de service dédiée. Le service gère les URLs des endpoints, la construction des requêtes et le typage des réponses. Les définitions d\'étapes restent épurées — elles orchestrent uniquement les appels et les assertions.',
+      api_h2_steps:'Définitions d\'étapes',
+      api_li1:'<strong>Services typés</strong> — chaque endpoint encapsulé dans une classe typée, endpoints comme enums',
+      api_li2:'<strong>Contexte partagé</strong> — l\'objet world de Cucumber (<code>FvContext</code>) transporte l\'état entre les étapes',
+      api_li3:'<strong>Assertions personnalisées</strong> — <code>assert.strictEqual()</code> avec des messages descriptifs plutôt que <code>expect().toBe()</code>',
+      api_li4:'<strong>Flux chaînés</strong> — créer → réserver → payer → vérifier, chaque étape réutilisant les données de la réponse précédente',
+      api_li5:'<strong>Configuration par environnement</strong> — URLs de base, tokens d\'authentification et données de test configurables par environnement',
+      bdd_p_how:'BDD avec Cucumber me permet d\'écrire des tests qui servent de spécifications exécutables. Les fichiers feature sont écrits avant l\'implémentation — ils définissent le contrat en langage naturel que les parties prenantes, les développeurs et les QAs peuvent lire et challenger. Les définitions d\'étapes appuient chaque scénario avec de vraies requêtes HTTP et des assertions typées, et une classe <code>World</code> fortement typée maintient l\'état du scénario explicite et sûr.',
+      bdd_h2_feature:'Fichier feature : flux de réservation de restaurant',
+      bdd_p_feature:'Chaque scénario couvre un aspect distinct du domaine de réservation — créer, annuler, modifier, rejet hors horaires et conflit de disponibilité. Le bloc <code>Background</code> gère les préconditions partagées pour que les scénarios individuels restent focalisés sur la variation testée.',
+      bdd_h2_world:'World context — état partagé typé',
+      bdd_p_world:'La classe <code>World</code> contient tout l\'état partagé entre les étapes d\'un scénario. Le typage en TypeScript force l\'intention explicite — si une étape écrit <code>bookingId</code>, l\'étape suivante qui le lit obtient une erreur de compilation si le champ n\'existe pas dans <code>World</code>. L\'instance Axios y réside aussi, préconfigurée avec l\'URL de base et un validateur de statut permissif.',
+      bdd_h2_steps:'Définitions d\'étapes',
+      bdd_p_steps:'Les étapes importent le <code>BookingWorld</code> typé et utilisent <code>this</code> pour lire et écrire l\'état partagé dans un scénario. Chaque étape effectue exactement une assertion ou un effet de bord — cela rend les échecs précis et lisibles sans fouiller les stack traces. Je préfère <code>assert.strictEqual</code> pour sa sortie non ambiguë.',
+      bdd_h2_hooks:'Hooks : health check, traçabilité et nettoyage',
+      bdd_p_hooks:'Les hooks gèrent les préoccupations d\'infrastructure séparément de la logique métier. <code>BeforeAll</code> protège toute l\'exécution contre un environnement défaillant. <code>Before</code> attache un ID de corrélation à chaque appel API. <code>After</code> supprime toute réservation créée pendant le scénario — quel que soit le résultat. <code>AfterAll</code> demande à l\'API de purger les données de test orphelines.',
+      bdd_li1:'<strong>Scénarios comme spécifications</strong> — les fichiers feature sont écrits avant l\'implémentation ; ils définissent le contrat, pas seulement le vérifier',
+      bdd_li2:'<strong>World typé</strong> — partager l\'état via une classe fortement typée détecte les erreurs d\'intégration à la compilation, pas en CI à minuit',
+      bdd_li3:'<strong>Une assertion par Then</strong> — des noms d\'étapes précis produisent des messages d\'échec lisibles ; vous savez exactement ce qui a échoué sans lire un stack trace',
+      bdd_li4:'<strong>Nettoyage idempotent</strong> — le hook After s\'exécute toujours même en cas d\'échec, les environnements restent donc cohérents sur toute la suite',
+      bdd_li5:'<strong>Scenario Outlines pour la variation de données</strong> — les tableaux remplacent les scénarios dupliqués tout en gardant Gherkin comme source unique de vérité',
+      bdd_li6:'<strong>Hooks pour l\'infrastructure, étapes pour la logique métier</strong> — les health checks sont dans les hooks ; l\'authentification et les actions métier sont dans les étapes',
+      ci_p_how:'CI/CD est l\'épine dorsale d\'une suite de tests fiable. Un test qui passe sur la machine d\'un développeur ne signifie rien s\'il ne s\'exécute jamais dans un environnement propre contre le build réel. J\'intègre Playwright, Cucumber et les tests API dans des pipelines GitHub Actions pour que chaque pull request soit validée avant de toucher main — et les déploiements n\'ont lieu que lorsque tous les quality gates passent.',
+      ci_h2_pipeline:'Pipeline : validation de pull request',
+      ci_p_pipeline:'Voici le pipeline PR principal. Il s\'exécute en parallèle — tests unitaires/API et tests E2E dans des jobs séparés pour que le feedback rapide arrive avant la fin des tests de navigateur plus lents. Le job <code>deploy</code> est bloqué jusqu\'à ce que les deux passent.',
+      ci_h2_gate:'Job de quality gate',
+      ci_p_gate:'Un job de quality gate dédié s\'exécute après le déploiement et bloque la promotion en production si une vérification échoue. Il exécute Lighthouse contre l\'URL de staging réelle et fait échouer le pipeline si les scores tombent en dessous des seuils — détectant les régressions introduites par le build lui-même.',
+      ci_h2_budget:'Configuration du budget Lighthouse',
+      ci_p_budget:'Les seuils de score sont versionnés comme du code pour que chaque contributeur connaisse la barre. Si une PR introduit une dépendance lourde qui dégrade les performances, le pipeline le détecte avant le merge — pas après qu\'un utilisateur se plaigne.',
+      ci_h2_artifacts:'Gestion des artefacts en cas d\'échec',
+      ci_p_artifacts:'Les artefacts sont uploadés inconditionnellement avec <code>if: always()</code> — ainsi quand un test échoue en CI et que l\'exécution a disparu le matin, la trace, les captures et le rapport HTML sont toujours là. Cela seul a économisé des heures de débogage du type "je ne peux pas le reproduire en local".',
+      ci_li1:'<strong>Secrets jamais dans le code</strong> — toutes les credentials passent par GitHub Secrets ou des variables d\'environnement ; le YAML du workflow est toujours sûr à committer',
+      ci_li2:'<strong>Jobs en parallèle</strong> — les tests rapides et lents s\'exécutent simultanément ; les développeurs reçoivent un feedback sur les tests API en ~2 min pendant que les E2E tournent encore',
+      ci_li3:'<strong>Artefacts à chaque échec</strong> — traces, captures et rapports sont uploadés inconditionnellement pour que les échecs intermittents laissent des preuves forensiques',
+      ci_li4:'<strong>Quality gates comme code</strong> — les budgets Lighthouse et les seuils de smoke tests sont versionnés avec l\'application, pas configurés dans un dashboard',
+      ci_li5:'<strong>Gates de promotion par environnement</strong> — staging et production sont des GitHub Environments séparés ; la promotion nécessite de passer le quality gate, pas seulement une approbation manuelle',
+      sql_p_how:'SQL est là où je valide ce que l\'application ne peut pas voir elle-même. Une API peut retourner 200 et laisser quand même la base de données dans un état corrompu — une réservation confirmée sans la ligne de paiement correspondante, un utilisateur supprimé dont les enregistrements n\'ont pas été propagés. J\'écris des requêtes de validation de données dans la suite de tests pour vérifier directement la source de vérité.',
+      sql_h2_integrity:'Vérification d\'intégrité après un flux de réservation',
+      sql_p_integrity:'Après qu\'un test E2E ou API crée une réservation, ces helpers vérifient que la base de données reflète l\'état attendu — pas seulement que la réponse l\'affirme. L\'implémenter dans un helper TypeScript le rend composable et typé.',
+      sql_h2_migration:'Vérification d\'intégrité de migration',
+      sql_p_migration:'Avant d\'exécuter une migration en staging, je valide que les contraintes, index et clés étrangères correspondent au schéma attendu. Ce pattern détecte les cas où une migration s\'applique sans erreur mais laisse le schéma dans une forme différente de ce qu\'attend la base de code.',
+      sql_h2_bulk:'Assertion de comptage de lignes après une opération en masse',
+      sql_p_bulk:'Les opérations en masse — imports, jobs planifiés, migrations de données — sont faciles à vérifier au niveau API mais l\'API ne renvoie souvent qu\'un comptage résumé. Je vérifie directement dans la table pour détecter les échecs partiels silencieux.',
+      sql_li1:'<strong>Vérifier la source de vérité</strong> — les réponses API reflètent l\'état de l\'application ; la base de données est l\'état réel. Les deux doivent concorder.',
+      sql_li2:'<strong>Requêtes paramétrées toujours</strong> — les helpers qui construisent des requêtes avec interpolation de chaînes sont un vecteur d\'injection SQL, même dans les environnements de test.',
+      sql_li3:'<strong>Validation de migration comme étape pré-déploiement</strong> — les assertions de schéma s\'exécutent avant le démarrage de l\'application en staging, pas après l\'apparition d\'une erreur cryptique en runtime.',
+      sql_li4:'<strong>Vérification des cascades</strong> — les opérations de suppression et d\'annulation nécessitent des vérifications explicites que les lignes liées ont été mises à jour ou libérées.',
+      sql_li5:'<strong>Nettoyage du pool de connexions</strong> — les helpers appellent <code>pool.end()</code> dans un hook <code>afterAll</code> pour éviter les processus de test bloqués par des connexions DB ouvertes.',
+      ts_p_how:'TypeScript est la couche qui rend un framework de test maintenable à grande échelle. Sans lui, un champ API renommé casse silencieusement dix définitions d\'étapes et vous ne le découvrez qu\'en CI. Avec lui, le compilateur détecte la rupture au moment où l\'interface change. J\'utilise le mode strict, des types de retour explicites et des utility types pour construire des helpers de test difficiles à mal utiliser.',
+      ts_h2_wrapper:'Wrapper typé de réponse API',
+      ts_p_wrapper:'Un wrapper générique de réponse maintient chaque appel API cohérent — statut, corps et latence dans une forme typée. Les définitions d\'étapes et les assertions travaillent contre ce type plutôt que les réponses Axios brutes, donc si le wrapper change, TypeScript signale immédiatement chaque point d\'appel affecté.',
+      ts_h2_request:'Helper de requête générique',
+      ts_p_request:'Un unique wrapper typé autour d\'Axios donne à chaque test une gestion des erreurs cohérente et un suivi de latence sans répéter le même boilerplate dans chaque étape. Le paramètre générique <code>T</code> se propage jusqu\'au type de retour pour que les appelants aient un autocomplétion complet sur <code>res.body</code>.',
+      ts_h2_factory:'Utility types dans les factories de test',
+      ts_p_factory:'Les utility types éliminent les interfaces dupliquées. <code>CreateBookingPayload</code> est dérivé du type complet <code>Booking</code> — donc si un champ obligatoire est ajouté au modèle de domaine, la factory échoue à la compilation plutôt que de produire silencieusement une requête invalide.',
+      ts_h2_pom:'Page Object typé avec des localisateurs stricts',
+      ts_p_pom:'Les classes Page Object déclarent les localisateurs en <code>readonly</code> pour que rien en dehors de la classe ne puisse les réassigner. Le constructeur est le seul endroit où vivent les sélecteurs — corriger un sélecteur cassé est un changement d\'une ligne sans risque de manquer une occurrence ailleurs.',
+      ts_li1:'<strong>Mode strict partout</strong> — <code>"strict": true</code> dans <code>tsconfig.json</code> détecte les déréférencements nuls et les <code>any</code> implicites avant qu\'ils ne deviennent des échecs en runtime',
+      ts_li2:'<strong>Dériver les types, pas les dupliquer</strong> — <code>Pick</code>, <code>Partial</code>, <code>Omit</code> et <code>Record</code> maintiennent les types de payload synchronisés avec les interfaces de domaine automatiquement',
+      ts_li3:'<strong>Types de retour explicites sur les helpers</strong> — les appelants voient le contrat sans lire l\'implémentation ; TypeScript garantit qu\'il ne dérive pas',
+      ts_li4:'<strong>Type guards plutôt que casting</strong> — <code>isApiError(body)</code> restreint le type en toute sécurité ; <code>body as ApiError</code> supprime juste l\'erreur et cache le bug',
+      ts_li5:'<strong>Readonly sur les localisateurs de Page Object</strong> — empêche la réassignation accidentelle et signale que ce sont des références stables, pas un état mutable',
+    },
+  };
+
+  function applyLang(lang) {
+    const dict = t[lang] || t.en;
+    document.documentElement.lang = lang;
+    localStorage.setItem('lang', lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('.nav__lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+  }
+
+  const saved   = localStorage.getItem('lang');
+  const browser = (navigator.language || '').slice(0, 2);
+  const lang    = (saved && t[saved]) ? saved : (t[browser] ? browser : 'en');
+
+  applyLang(lang);
+
+  document.querySelectorAll('.nav__lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+})();
+</script>

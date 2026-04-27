@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i -e 's/<h2>Real example: Login flow test<\\\\/h2>/<h2 data-i18n=\"pw_h2_example\">Real example: Login flow test<\\\\/h2>/' -e 's/<h2>Page Object pattern<\\\\/h2>/<h2 data-i18n=\"pw_h2_pom\">Page Object pattern<\\\\/h2>/' src/pages/skills/playwright.astro)",
+      "Bash(sed -i -e 's/<h2>Real example: Booking zone creation<\\\\/h2>/<h2 data-i18n=\"api_h2_example\">Real example: Booking zone creation<\\\\/h2>/' -e 's/<h2>Service layer pattern<\\\\/h2>/<h2 data-i18n=\"api_h2_service\">Service layer pattern<\\\\/h2>/' -e 's/<h2>Step definitions<\\\\/h2>/<h2 data-i18n=\"api_h2_steps\">Step definitions<\\\\/h2>/' src/pages/skills/api-testing.astro)",
+      "Bash(sed -i -e 's/<h2>Feature file: restaurant booking flow<\\\\/h2>/<h2 data-i18n=\"bdd_h2_feature\">Feature file: restaurant booking flow<\\\\/h2>/' -e 's/<h2>World context — typed shared state<\\\\/h2>/<h2 data-i18n=\"bdd_h2_world\">World context — typed shared state<\\\\/h2>/' -e 's/<h2>Step definitions<\\\\/h2>/<h2 data-i18n=\"bdd_h2_steps\">Step definitions<\\\\/h2>/' -e 's/<h2>Hooks: health check, tracing, and cleanup<\\\\/h2>/<h2 data-i18n=\"bdd_h2_hooks\">Hooks: health check, tracing, and cleanup<\\\\/h2>/' src/pages/skills/bdd-gherkin.astro)",
+      "Bash(sed -i -e 's/<h2>Pipeline: pull request validation<\\\\/h2>/<h2 data-i18n=\"ci_h2_pipeline\">Pipeline: pull request validation<\\\\/h2>/' -e 's/<h2>Quality gate job<\\\\/h2>/<h2 data-i18n=\"ci_h2_gate\">Quality gate job<\\\\/h2>/' -e 's/<h2>Lighthouse budget config<\\\\/h2>/<h2 data-i18n=\"ci_h2_budget\">Lighthouse budget config<\\\\/h2>/' -e 's/<h2>Handling test artifacts on failure<\\\\/h2>/<h2 data-i18n=\"ci_h2_artifacts\">Handling test artifacts on failure<\\\\/h2>/' src/pages/skills/cicd.astro)",
+      "Bash(sed -i -e 's/<h2>Data integrity check after a booking flow<\\\\/h2>/<h2 data-i18n=\"sql_h2_integrity\">Data integrity check after a booking flow<\\\\/h2>/' -e 's/<h2>Migration integrity check<\\\\/h2>/<h2 data-i18n=\"sql_h2_migration\">Migration integrity check<\\\\/h2>/' -e 's/<h2>Row-count assertion after a bulk operation<\\\\/h2>/<h2 data-i18n=\"sql_h2_bulk\">Row-count assertion after a bulk operation<\\\\/h2>/' src/pages/skills/sql.astro)",
+      "Bash(python3 -)",
+      "Bash(python3)",
+      "Bash(python3 *)",
+      "Bash(node .claude/tag_i18n.mjs)"
+    ]
+  }
+}

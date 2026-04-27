@@ -1,0 +1,242 @@
+---
+import SkillLayout from '../../layouts/SkillLayout.astro';
+import Terminal from '../../components/Terminal.astro';
+---
+
+<SkillLayout
+  title="CI/CD & Quality Gates"
+  description="GitHub Actions pipelines, automated quality gates, Lighthouse audits, and deployment workflows."
+  tags={['GitHub Actions', 'CI/CD', 'Lighthouse', 'Git', 'Docker']}
+  level="frequent"
+  experience="2+ years"
+>
+
+  <h2 data-i18n="h_how">How I use it</h2>
+  <p data-i18n="ci_p_how">
+    CI/CD is the backbone of a trustworthy test suite. A passing test on a developer's
+    machine means nothing if it never runs on a clean environment against the real build.
+    I wire Playwright, Cucumber, and API tests into GitHub Actions pipelines so every
+    pull request is validated before it touches main — and deployments only happen
+    when all quality gates pass.
+  </p>
+
+  <h2 data-i18n="ci_h2_pipeline">Pipeline: pull request validation</h2>
+  <p data-i18n="ci_p_pipeline">
+    This is the core PR pipeline. It runs in parallel — unit/API tests and E2E tests
+    on separate jobs so fast feedback arrives before the slower browser tests finish.
+    The <code>deploy</code> job is blocked until both pass.
+  </p>
+
+  <Terminal filename=".github/workflows/ci.yml">
+    <pre><code>name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  api-tests:
+    name: API & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: $&#123;&#123; env.NODE_VERSION &#125;&#125;
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run API tests
+        run: npm run test:api
+        env:
+          API_BASE_URL: $&#123;&#123; secrets.STAGING_API_URL &#125;&#125;
+          API_TOKEN:    $&#123;&#123; secrets.STAGING_API_TOKEN &#125;&#125;
+
+      - name: Upload Cucumber report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: reports/cucumber/
+
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: $&#123;&#123; env.NODE_VERSION &#125;&#125;
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test --project=chromium
+        env:
+          BASE_URL:  $&#123;&#123; secrets.STAGING_BASE_URL &#125;&#125;
+          AUTH_TOKEN: $&#123;&#123; secrets.STAGING_AUTH_TOKEN &#125;&#125;
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+  deploy:
+    name: Deploy to Staging
+    needs: [api-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy
+        run: ./scripts/deploy.sh staging
+        env:
+          DEPLOY_TOKEN: $&#123;&#123; secrets.DEPLOY_TOKEN &#125;&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ci_h2_gate">Quality gate job</h2>
+  <p data-i18n="ci_p_gate">
+    A dedicated quality gate job runs after deployment and blocks promotion to production
+    if any check fails. It runs Lighthouse against the live staging URL and fails the
+    pipeline if scores drop below thresholds — catching regressions introduced by the
+    build itself, not just the code.
+  </p>
+
+  <Terminal filename=".github/workflows/quality-gate.yml">
+    <pre><code>name: Quality Gate
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    if: $&#123;&#123; github.event.workflow_run.conclusion == 'success' &#125;&#125;
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            $&#123;&#123; secrets.STAGING_BASE_URL &#125;&#125;
+            $&#123;&#123; secrets.STAGING_BASE_URL &#125;&#125;/dashboard
+          budgetPath: .github/lighthouse-budget.json
+          uploadArtifacts: true
+
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    if: $&#123;&#123; github.event.workflow_run.conclusion == 'success' &#125;&#125;
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run smoke suite
+        run: npx playwright test --grep @smoke
+        env:
+          BASE_URL: $&#123;&#123; secrets.STAGING_BASE_URL &#125;&#125;
+
+  promote:
+    name: Promote to Production
+    needs: [lighthouse, smoke-tests]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy.sh production
+        env:
+          DEPLOY_TOKEN: $&#123;&#123; secrets.DEPLOY_TOKEN &#125;&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ci_h2_budget">Lighthouse budget config</h2>
+  <p data-i18n="ci_p_budget">
+    Score thresholds are committed as code so every contributor knows the bar.
+    If a PR introduces a heavy dependency that tanks performance, the pipeline
+    catches it before merge — not after a user complains.
+  </p>
+
+  <Terminal filename=".github/lighthouse-budget.json">
+    <pre><code>[
+  &#123;
+    "path": "/*",
+    "assertions": &#123;
+      "categories:performance":    &#123; "minScore": 0.9,  "aggregationMethod": "pessimistic" &#125;,
+      "categories:accessibility":  &#123; "minScore": 0.95, "aggregationMethod": "pessimistic" &#125;,
+      "categories:best-practices": &#123; "minScore": 0.9,  "aggregationMethod": "pessimistic" &#125;,
+      "categories:seo":            &#123; "minScore": 0.9,  "aggregationMethod": "pessimistic" &#125;,
+      "first-contentful-paint":    &#123; "maxNumericValue": 2000 &#125;,
+      "largest-contentful-paint":  &#123; "maxNumericValue": 3000 &#125;,
+      "total-blocking-time":       &#123; "maxNumericValue": 300  &#125;,
+      "cumulative-layout-shift":   &#123; "maxNumericValue": 0.1  &#125;
+    &#125;
+  &#125;
+]</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="ci_h2_artifacts">Handling test artifacts on failure</h2>
+  <p data-i18n="ci_p_artifacts">
+    Artifacts are uploaded unconditionally with <code>if: always()</code> — so when
+    a test fails in CI and the run is gone by morning, the trace, screenshots, and
+    HTML report are still there. This alone has saved hours of "I can't reproduce it
+    locally" debugging.
+  </p>
+
+  <Terminal filename=".github/workflows/ci.yml (artifact step)">
+    <pre><code>      - name: Upload Playwright trace on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-$&#123;&#123; github.run_id &#125;&#125;
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+      - name: Notify on failure
+        if: failure() &amp;&amp; github.ref == 'refs/heads/main'
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            &#123;
+              "text": ":red_circle: E2E tests failed on `main` — &lt;$&#123;&#123; github.server_url &#125;&#125;/$&#123;&#123; github.repository &#125;&#125;/actions/runs/$&#123;&#123; github.run_id &#125;&#125;|View run&gt;"
+            &#125;
+        env:
+          SLACK_WEBHOOK_URL: $&#123;&#123; secrets.SLACK_WEBHOOK_URL &#125;&#125;</code></pre>
+  </Terminal>
+
+  <h2 data-i18n="h_focus">What I focus on</h2>
+  <ul>
+    <li data-i18n="ci_li1"><strong>Secrets never in code</strong> — all credentials go through GitHub Secrets or environment variables; the workflow YAML is always safe to commit</li>
+    <li data-i18n="ci_li2"><strong>Parallel jobs</strong> — fast and slow tests run concurrently; developers get feedback on API tests in ~2 min while E2E tests are still running</li>
+    <li data-i18n="ci_li3"><strong>Artifacts on every failure</strong> — traces, screenshots, and reports are uploaded unconditionally so flaky failures leave forensic evidence</li>
+    <li data-i18n="ci_li4"><strong>Quality gates as code</strong> — Lighthouse budgets and smoke test thresholds are versioned alongside the application, not configured in a dashboard</li>
+    <li data-i18n="ci_li5"><strong>Environment promotion gates</strong> — staging and production are separate GitHub Environments; promotion requires explicit quality gate passage, not manual approval alone</li>
+  </ul>
+
+</SkillLayout>

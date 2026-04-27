@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+
+# secrets — never commit
+.env
+.env.*
+*.pem
+
+# local-only files
+portfolio/
+agente.js
+.claude/tag_i18n.mjs
